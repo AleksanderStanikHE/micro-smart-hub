@@ -1,0 +1,4 @@
+Threaded Device:
+  class: FakeThreadedDevice
+  parameters:
+    interval: 2.0

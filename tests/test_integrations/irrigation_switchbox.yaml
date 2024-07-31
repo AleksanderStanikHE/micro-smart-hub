@@ -1,0 +1,19 @@
+Irrigation:
+  schedule:
+    monday:
+      - hour: 6
+        action: on
+      - hour: 18
+        action: off
+    wednesday:
+      - hour: 6
+        action: on
+      - hour: 18
+        action: off
+    friday:
+      - hour: 6
+        action: on
+      - hour: 18
+        action: off
+  devices:
+    - SwitchBox

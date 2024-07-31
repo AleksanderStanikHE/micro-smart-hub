@@ -1,0 +1,9 @@
+Pump:
+  class: SwitchBox
+  parameters:
+    url: 192.168.0.3
+
+Garden Light:
+  class: SwitchBox
+  parameters:
+    url: 192.168.0.197      
