@@ -2,7 +2,8 @@ from setuptools import setup, find_packages
 
 setup(
     name="micro-smart-hub",
-    version="0.1.0",
+    use_scm_version=True,
+    setup_requires=['setuptools_scm'],
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
@@ -21,7 +22,7 @@ setup(
     description="A small smart hub building blocks package",
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
-    url="https://github.com/yourusername/micro-smart-hub",
+    url="https://github.com/AleksanderStanikHE/micro-smart-hub.git",
     classifiers=[
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: MIT License',
