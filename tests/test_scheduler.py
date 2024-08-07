@@ -26,92 +26,195 @@ class LazySwitch(IoTSwitch):
         self._on = value
 
 
-class TestMicroScheduler(unittest.IsolatedAsyncioTestCase):
+# Use Python version to choose the appropriate test class
+if sys.version_info >= (3, 8):
 
-    def test_scheduler_init(self):
-        scheduler = MicroScheduler()
-        self.assertIsInstance(scheduler, MicroScheduler)
+    class TestMicroScheduler(unittest.IsolatedAsyncioTestCase):
 
-        self.assertIsInstance(Devices, dict)
-        self.assertIsInstance(Automations, dict)
-        self.assertIsInstance(scheduler.schedule, dict)
+        def test_scheduler_init(self):
+            scheduler = MicroScheduler()
+            self.assertIsInstance(scheduler, MicroScheduler)
 
-    @patch('micro_smart_hub.scheduler.datetime')
-    async def test_scheduler(self, mock_datetime):
-        mock_datetime.strftime = datetime.strftime
+            self.assertIsInstance(Devices, dict)
+            self.assertIsInstance(Automations, dict)
+            self.assertIsInstance(scheduler.schedule, dict)
 
-        scheduler = MicroScheduler()
-        Automations["FakeAutomation"] = Automation()
-        Devices["FakeSwitch"] = IoTSwitch()
+        @patch('micro_smart_hub.scheduler.datetime')
+        async def test_scheduler(self, mock_datetime):
+            mock_datetime.strftime = datetime.strftime
 
-        schedule_file_path = os.path.join(os.path.dirname(__file__), 'schedule.yaml')
-        scheduler.load_schedule(schedule_file_path)
+            scheduler = MicroScheduler()
+            Automations["FakeAutomation"] = Automation()
+            Devices["FakeSwitch"] = IoTSwitch()
 
-        self.assertTrue("FakeAutomation" in scheduler.schedule)
-        fake_automation_schedule = scheduler.schedule["FakeAutomation"]["schedule"]
-        self.assertTrue("monday" in fake_automation_schedule)
-        self.assertTrue("wednesday" in fake_automation_schedule)
-        self.assertTrue("friday" in fake_automation_schedule)
+            schedule_file_path = os.path.join(os.path.dirname(__file__), 'schedule.yaml')
+            scheduler.load_schedule(schedule_file_path)
 
-        mock_datetime.now.return_value = datetime(2024, 7, 19, 6)
-        await scheduler.run()
-        self.assertEqual(Devices["FakeSwitch"].on, 1)
+            self.assertTrue("FakeAutomation" in scheduler.schedule)
+            fake_automation_schedule = scheduler.schedule["FakeAutomation"]["schedule"]
+            self.assertTrue("monday" in fake_automation_schedule)
+            self.assertTrue("wednesday" in fake_automation_schedule)
+            self.assertTrue("friday" in fake_automation_schedule)
 
-        mock_datetime.now.return_value = datetime(2024, 7, 19, 7)
-        await scheduler.run()
-        self.assertEqual(Devices["FakeSwitch"].on, 1)
+            mock_datetime.now.return_value = datetime(2024, 7, 19, 6)
+            await scheduler.run()
+            self.assertEqual(Devices["FakeSwitch"].on, 1)
 
-        mock_datetime.now.return_value = datetime(2024, 7, 19, 8)
-        await scheduler.run()
-        self.assertEqual(Devices["FakeSwitch"].on, 1)
+            mock_datetime.now.return_value = datetime(2024, 7, 19, 7)
+            await scheduler.run()
+            self.assertEqual(Devices["FakeSwitch"].on, 1)
 
-        mock_datetime.now.return_value = datetime(2024, 7, 19, 18)
-        await scheduler.run()
-        self.assertEqual(Devices["FakeSwitch"].on, 0)
+            mock_datetime.now.return_value = datetime(2024, 7, 19, 8)
+            await scheduler.run()
+            self.assertEqual(Devices["FakeSwitch"].on, 1)
 
-        mock_datetime.now.return_value = datetime(2024, 7, 19, 19)
-        await scheduler.run()
-        self.assertEqual(Devices["FakeSwitch"].on, 0)
+            mock_datetime.now.return_value = datetime(2024, 7, 19, 18)
+            await scheduler.run()
+            self.assertEqual(Devices["FakeSwitch"].on, 0)
 
-        mock_datetime.now.return_value = datetime(2024, 7, 19, 20)
-        await scheduler.run()
-        self.assertEqual(Devices["FakeSwitch"].on, 0)
+            mock_datetime.now.return_value = datetime(2024, 7, 19, 19)
+            await scheduler.run()
+            self.assertEqual(Devices["FakeSwitch"].on, 0)
 
-    @patch('micro_smart_hub.scheduler.datetime')
-    async def test_scheduler_concurrent_execution(self, mock_datetime):
-        mock_datetime.strftime = datetime.strftime
+            mock_datetime.now.return_value = datetime(2024, 7, 19, 20)
+            await scheduler.run()
+            self.assertEqual(Devices["FakeSwitch"].on, 0)
 
-        scheduler = MicroScheduler()
-        Automations["Irrigation"] = Automation()
-        Automations["Garden_Lights"] = Automation()
-        Automations["Front_Lights"] = Automation()
-        Devices["Irrigation_Pump"] = LazySwitch()
-        Devices["Front_Light"] = LazySwitch()
-        Devices["Garden_Light"] = LazySwitch()
+        @patch('micro_smart_hub.scheduler.datetime')
+        async def test_scheduler_concurrent_execution(self, mock_datetime):
+            mock_datetime.strftime = datetime.strftime
 
-        schedule_file_path = os.path.join(os.path.dirname(__file__), 'schedule.yaml')
-        scheduler.load_schedule(schedule_file_path)
+            scheduler = MicroScheduler()
+            Automations["Irrigation"] = Automation()
+            Automations["Garden_Lights"] = Automation()
+            Automations["Front_Lights"] = Automation()
+            Devices["Irrigation_Pump"] = LazySwitch()
+            Devices["Front_Light"] = LazySwitch()
+            Devices["Garden_Light"] = LazySwitch()
 
-        # Set the mock time to a point where both FakeAutomation and Irrigation should run
-        mock_datetime.now.return_value = datetime(2024, 7, 22, 6)
+            schedule_file_path = os.path.join(os.path.dirname(__file__), 'schedule.yaml')
+            scheduler.load_schedule(schedule_file_path)
 
-        # Verify the switch state
-        self.assertEqual(Devices["Irrigation_Pump"].on, 0)
-        self.assertEqual(Devices["Front_Light"].on, 0)
-        self.assertEqual(Devices["Garden_Light"].on, 0)
+            # Set the mock time to a point where both FakeAutomation and Irrigation should run
+            mock_datetime.now.return_value = datetime(2024, 7, 22, 6)
 
-        # Measure the execution time of the scheduler
-        start_time = time.time()
-        await scheduler.run()
-        elapsed_time = time.time() - start_time
+            # Verify the switch state
+            self.assertEqual(Devices["Irrigation_Pump"].on, 0)
+            self.assertEqual(Devices["Front_Light"].on, 0)
+            self.assertEqual(Devices["Garden_Light"].on, 0)
 
-        # Verify the switch state
-        self.assertEqual(Devices["Irrigation_Pump"].on, 1)
-        self.assertEqual(Devices["Front_Light"].on, 1)
-        self.assertEqual(Devices["Garden_Light"].on, 1)
+            # Measure the execution time of the scheduler
+            start_time = time.time()
+            await scheduler.run()
+            elapsed_time = time.time() - start_time
 
-        # Assert that the elapsed time is within an acceptable range
-        self.assertLess(elapsed_time, 3, "Scheduler run took too long")
+            # Verify the switch state
+            self.assertEqual(Devices["Irrigation_Pump"].on, 1)
+            self.assertEqual(Devices["Front_Light"].on, 1)
+            self.assertEqual(Devices["Garden_Light"].on, 1)
+
+            # Assert that the elapsed time is within an acceptable range
+            self.assertLess(elapsed_time, 3, "Scheduler run took too long")
+
+else:
+    import asyncio
+
+    class TestMicroScheduler(unittest.TestCase):
+        def setUp(self):
+            self.loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(self.loop)
+
+        def tearDown(self):
+            self.loop.close()
+
+        def run_async(self, coro):
+            """Helper method to run an asynchronous coroutine in the loop."""
+            return self.loop.run_until_complete(coro)
+
+        def test_scheduler_init(self):
+            scheduler = MicroScheduler()
+            self.assertIsInstance(scheduler, MicroScheduler)
+
+            self.assertIsInstance(Devices, dict)
+            self.assertIsInstance(Automations, dict)
+            self.assertIsInstance(scheduler.schedule, dict)
+
+        @patch('micro_smart_hub.scheduler.datetime')
+        def test_scheduler(self, mock_datetime):
+            mock_datetime.strftime = datetime.strftime
+
+            scheduler = MicroScheduler()
+            Automations["FakeAutomation"] = Automation()
+            Devices["FakeSwitch"] = IoTSwitch()
+
+            schedule_file_path = os.path.join(os.path.dirname(__file__), 'schedule.yaml')
+            scheduler.load_schedule(schedule_file_path)
+
+            self.assertTrue("FakeAutomation" in scheduler.schedule)
+            fake_automation_schedule = scheduler.schedule["FakeAutomation"]["schedule"]
+            self.assertTrue("monday" in fake_automation_schedule)
+            self.assertTrue("wednesday" in fake_automation_schedule)
+            self.assertTrue("friday" in fake_automation_schedule)
+
+            mock_datetime.now.return_value = datetime(2024, 7, 19, 6)
+            self.run_async(scheduler.run())
+            self.assertEqual(Devices["FakeSwitch"].on, 1)
+
+            mock_datetime.now.return_value = datetime(2024, 7, 19, 7)
+            self.run_async(scheduler.run())
+            self.assertEqual(Devices["FakeSwitch"].on, 1)
+
+            mock_datetime.now.return_value = datetime(2024, 7, 19, 8)
+            self.run_async(scheduler.run())
+            self.assertEqual(Devices["FakeSwitch"].on, 1)
+
+            mock_datetime.now.return_value = datetime(2024, 7, 19, 18)
+            self.run_async(scheduler.run())
+            self.assertEqual(Devices["FakeSwitch"].on, 0)
+
+            mock_datetime.now.return_value = datetime(2024, 7, 19, 19)
+            self.run_async(scheduler.run())
+            self.assertEqual(Devices["FakeSwitch"].on, 0)
+
+            mock_datetime.now.return_value = datetime(2024, 7, 19, 20)
+            self.run_async(scheduler.run())
+            self.assertEqual(Devices["FakeSwitch"].on, 0)
+
+        @patch('micro_smart_hub.scheduler.datetime')
+        def test_scheduler_concurrent_execution(self, mock_datetime):
+            mock_datetime.strftime = datetime.strftime
+
+            scheduler = MicroScheduler()
+            Automations["Irrigation"] = Automation()
+            Automations["Garden_Lights"] = Automation()
+            Automations["Front_Lights"] = Automation()
+            Devices["Irrigation_Pump"] = LazySwitch()
+            Devices["Front_Light"] = LazySwitch()
+            Devices["Garden_Light"] = LazySwitch()
+
+            schedule_file_path = os.path.join(os.path.dirname(__file__), 'schedule.yaml')
+            scheduler.load_schedule(schedule_file_path)
+
+            # Set the mock time to a point where both FakeAutomation and Irrigation should run
+            mock_datetime.now.return_value = datetime(2024, 7, 22, 6)
+
+            # Verify the switch state
+            self.assertEqual(Devices["Irrigation_Pump"].on, 0)
+            self.assertEqual(Devices["Front_Light"].on, 0)
+            self.assertEqual(Devices["Garden_Light"].on, 0)
+
+            # Measure the execution time of the scheduler
+            start_time = time.time()
+            self.run_async(scheduler.run())
+            elapsed_time = time.time() - start_time
+
+            # Verify the switch state
+            self.assertEqual(Devices["Irrigation_Pump"].on, 1)
+            self.assertEqual(Devices["Front_Light"].on, 1)
+            self.assertEqual(Devices["Garden_Light"].on, 1)
+
+            # Assert that the elapsed time is within an acceptable range
+            self.assertLess(elapsed_time, 3, "Scheduler run took too long")
 
 
 def suite():
