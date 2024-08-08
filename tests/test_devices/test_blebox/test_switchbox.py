@@ -1,11 +1,11 @@
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))))
+sys.path.append(os.path.abspath(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))))
 
 import unittest
 import time
 from unittest.mock import patch, MagicMock, Mock
-from micro_smart_hub.devices.switchbox import SwitchBox
+from micro_smart_hub.devices.blebox.switchbox import SwitchBox
 from requests.exceptions import ConnectionError
 
 switchbox_definiton = {

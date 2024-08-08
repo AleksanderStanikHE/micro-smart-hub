@@ -36,4 +36,44 @@ Irrigation:
       - hour: 18
         action: off
   devices:
-    - FakeSwitch
+    - Irrigation_Pump
+
+Garden_Lights:
+  schedule:
+    monday:
+      - hour: 6
+        action: on
+      - hour: 18
+        action: off
+    wednesday:
+      - hour: 6
+        action: on
+      - hour: 18
+        action: off
+    friday:
+      - hour: 6
+        action: on
+      - hour: 18
+        action: off
+  devices:
+    - Garden_Light
+
+Front_Lights:
+  schedule:
+    monday:
+      - hour: 6
+        action: on
+      - hour: 18
+        action: off
+    wednesday:
+      - hour: 6
+        action: on
+      - hour: 18
+        action: off
+    friday:
+      - hour: 6
+        action: on
+      - hour: 18
+        action: off
+  devices:
+    - Front_Light
