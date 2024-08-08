@@ -23,7 +23,7 @@ class TestRegistry(unittest.TestCase):
     def test_class_registry(self):
         load_modules_from_directory('micro_smart_hub/automations')
         self.assertTrue("Irrigation" in class_registry)
-        load_modules_from_directory('micro_smart_hub/devices')
+        load_modules_from_directory('micro_smart_hub/devices/blebox')
         self.assertTrue("SwitchBox" in class_registry)
 
         irrigation = create_instance("Irrigation", **irrigation_definition)

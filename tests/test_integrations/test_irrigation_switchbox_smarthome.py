@@ -7,7 +7,7 @@ from datetime import datetime
 from unittest.mock import patch, Mock
 from micro_smart_hub.automations.irrigation import Irrigation
 from micro_smart_hub.scheduler import MicroScheduler, Automations, Devices
-from micro_smart_hub.devices.switchbox import SwitchBox
+from micro_smart_hub.devices.blebox.switchbox import SwitchBox
 
 irrigation_scenarios = {
     "Wind_OK_SoilMoisture_WRONG": {
@@ -87,7 +87,7 @@ def my_side_effect(url, *args, **kwargs):
 
 class TestIrrigationSwitchBoxSmartHome(unittest.TestCase):
 
-    @patch('micro_smart_hub.devices.switchbox.requests')
+    @patch('micro_smart_hub.devices.blebox.switchbox.requests')
     @patch('micro_smart_hub.automations.irrigation.datetime')
     def test_system_run(self, mock_datetime, mock_get):
 
