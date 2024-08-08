@@ -69,6 +69,6 @@ def load_instances_from_yaml(filename: str):
 
         for instance_name, instance_info in data.items():
             class_name = instance_info['class']
-            parameters = instance_info['parameters']
+            parameters = instance_info.get('parameters', {})
             instance = create_instance(class_name, **parameters)
             instance_registry[instance_name] = instance

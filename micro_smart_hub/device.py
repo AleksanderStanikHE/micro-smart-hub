@@ -1,6 +1,7 @@
 import threading
 import time
 from enum import Enum
+from micro_smart_hub.registry import register_class
 
 
 class DeviceState(Enum):
@@ -64,6 +65,7 @@ class MicroDevice():
         pass
 
 
+@register_class
 class IoTSwitch(MicroDevice):
     def __init__(self, definition={}) -> None:
         super().__init__(definition)

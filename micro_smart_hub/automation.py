@@ -1,8 +1,10 @@
 import abc
 from typing import List
 from micro_smart_hub.device import MicroDevice, IoTSwitch
+from micro_smart_hub.registry import register_class
 
 
+@register_class
 class Automation(abc.ABC):
     def __init__(self, definition={}) -> None:
         self.definition = definition
