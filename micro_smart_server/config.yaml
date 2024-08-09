@@ -1,5 +1,17 @@
-Switch:
+Switch_1:
   class: IoTSwitch
 
-Task:
+Switch_2:
+  class: IoTSwitch
+
+Switch_3:
+  class: IoTSwitch
+
+Task_1:
+  class: Automation
+
+Task_2:
+  class: Automation
+
+Task_3:
   class: Automation

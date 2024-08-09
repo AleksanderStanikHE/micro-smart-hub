@@ -5,7 +5,7 @@ sys.path.append(os.path.abspath(os.path.dirname(os.path.dirname(__file__))))
 import unittest
 from micro_smart_hub.automation import Automation
 from micro_smart_hub.device import MicroDevice
-from micro_smart_hub.registry import load_modules_from_directory, class_registry, create_instance, load_instances_from_yaml, instance_registry
+from micro_smart_hub.registry import load_modules_from_directory, class_registry, create_instance, load_instances_from_yaml, instance_registry, filter_instances_by_base_class
 
 
 irrigation_definition = {
@@ -38,9 +38,15 @@ class TestRegistry(unittest.TestCase):
         load_modules_from_directory('micro_smart_hub/automations')
         load_modules_from_directory('micro_smart_hub/devices')
 
-        load_instances_from_yaml('tests/devices.yaml')
+        load_instances_from_yaml('tests/config.yaml')
 
         self.assertTrue("Pump" in instance_registry)
+        self.assertTrue("SmartIrrigation" in instance_registry)
+
+        filtered_instances = filter_instances_by_base_class(MicroDevice)
+
+        self.assertTrue("Pump" in filtered_instances)
+        self.assertTrue("SmartIrrigation" not in filtered_instances)
 
 
 def suite():

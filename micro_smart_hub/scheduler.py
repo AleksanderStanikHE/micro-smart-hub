@@ -1,13 +1,10 @@
 import yaml
 import asyncio
-from typing import Dict
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
 from micro_smart_hub.automation import Automation
 from micro_smart_hub.device import MicroDevice
-
-Automations: Dict[str, Automation] = {}
-Devices: Dict[str, MicroDevice] = {}
+from micro_smart_hub.registry import filter_instances_by_base_class
 
 
 class MicroScheduler:
@@ -21,6 +18,7 @@ class MicroScheduler:
             self.schedule = yaml.safe_load(file)
 
     async def run(self) -> None:
+        Automations = filter_instances_by_base_class(Automation)
         current_time = datetime.now()
         current_day = current_time.strftime('%A').lower()
         current_hour = current_time.hour
@@ -35,6 +33,8 @@ class MicroScheduler:
         await asyncio.gather(*tasks)
 
     def schedule_tasks_for_hour(self, automation_name: str, automation_data: dict, current_day: str, current_hour: int):
+        Devices = filter_instances_by_base_class(MicroDevice)
+        Automations = filter_instances_by_base_class(Automation)
         tasks = []
         schedule_tasks = automation_data.get('schedule', {}).get(current_day, [])
         devices_names = automation_data.get('devices', {})

@@ -72,3 +72,23 @@ def load_instances_from_yaml(filename: str):
             parameters = instance_info.get('parameters', {})
             instance = create_instance(class_name, **parameters)
             instance_registry[instance_name] = instance
+
+
+def filter_instances_by_base_class(base_class):
+    """
+    Filters instances in the instance_registry by a given base class.
+
+    Args:
+        base_class (type): The base class to filter by.
+
+    Returns:
+        dict: A dictionary of instances that inherit from the specified base class.
+    """
+    filtered_instances = {}
+
+    for instance_name, instance in instance_registry.items():
+        # Check if the instance is an object and if its class inherits from the base class
+        if isinstance(instance, base_class):
+            filtered_instances[instance_name] = instance
+
+    return filtered_instances

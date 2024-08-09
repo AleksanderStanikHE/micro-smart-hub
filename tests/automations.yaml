@@ -1,5 +1,0 @@
-SmartIrrigation:
-  class: Irrigation
-  parameters:
-    latitude: 12.24541322
-    longitude: 32.32243421

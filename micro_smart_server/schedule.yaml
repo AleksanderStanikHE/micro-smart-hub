@@ -1,4 +1,4 @@
-Task:
+Task_1:
   schedule:
     monday:
       - hour: 6
@@ -21,4 +21,54 @@ Task:
       - hour: 18
         action: off        
   devices:
-    - Switch
+    - Switch_1
+
+Task_2:
+  schedule:
+    monday:
+      - hour: 6
+        action: on
+      - hour: 18
+        action: off
+    wednesday:
+      - hour: 6
+        action: on
+      - hour: 18
+        action: off
+    friday:
+      - hour: 6
+        action: on
+      - hour: 18
+        action: off
+    sunday:
+      - hour: 6
+        action: on
+      - hour: 18
+        action: off        
+  devices:
+    - Switch_2
+
+Task_3:
+  schedule:
+    monday:
+      - hour: 6
+        action: on
+      - hour: 18
+        action: off
+    wednesday:
+      - hour: 6
+        action: on
+      - hour: 18
+        action: off
+    friday:
+      - hour: 6
+        action: on
+      - hour: 16
+        action: off
+    sunday:
+      - hour: 6
+        action: on
+      - hour: 18
+        action: off        
+  devices:
+    - Switch_3

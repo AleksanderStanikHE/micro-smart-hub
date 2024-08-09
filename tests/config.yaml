@@ -7,3 +7,9 @@ Garden Light:
   class: SwitchBox
   parameters:
     url: 192.168.0.197      
+
+SmartIrrigation:
+  class: Irrigation
+  parameters:
+    latitude: 12.24541322
+    longitude: 32.32243421

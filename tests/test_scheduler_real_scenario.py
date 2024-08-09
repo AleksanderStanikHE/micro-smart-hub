@@ -8,16 +8,17 @@ import threading
 import time
 from unittest.mock import patch
 from datetime import datetime, timedelta
-from micro_smart_hub.scheduler import MicroScheduler, SchedulerRunner, Automations, Devices
+from micro_smart_hub.scheduler import MicroScheduler, SchedulerRunner
 from micro_smart_hub.automation import Automation
 from micro_smart_hub.device import IoTSwitch
+from micro_smart_hub.registry import instance_registry
 
 
 class TestMicroSchedulerRealScenario(unittest.TestCase):
 
     def setUp(self):
-        Automations["FakeAutomation"] = Automation()
-        Devices["FakeSwitch"] = IoTSwitch()
+        instance_registry["FakeAutomation"] = Automation()
+        instance_registry["FakeSwitch"] = IoTSwitch()
 
         self.scheduler = MicroScheduler()
         schedule_file_path = os.path.join(os.path.dirname(__file__), 'schedule.yaml')
@@ -54,7 +55,7 @@ class TestMicroSchedulerRealScenario(unittest.TestCase):
 
             # Check the switch state based on the expected schedule
             expected_state = 1 if 6 <= current_time.hour < 18 else 0
-            self.assertEqual(Devices["FakeSwitch"].on, expected_state, f"Hour = {hour_offset}")
+            self.assertEqual(instance_registry["FakeSwitch"].on, expected_state, f"Hour = {hour_offset}")
 
 
 def suite():
