@@ -50,7 +50,7 @@ jobs:
     needs: tests
     strategy:
       matrix:
-        python-version: [3.7, 3.8, 3.9, 3.10, 3.11]  # Test against multiple Python versions
+        python-version: [3.7.17, 3.8.18, 3.9.19, 3.10.14, 3.11.9, 3.12.4]  # Test against multiple Python versions
 
     steps:
       - name: Checkout repository
@@ -68,7 +68,7 @@ jobs:
 
       - name: Install build tools
         run: |
-          pip install setuptools wheel
+          pip install setuptools wheel twine setuptools-scm
 
       - name: Build the package
         run: |
