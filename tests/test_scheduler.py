@@ -13,7 +13,7 @@ from micro_smart_hub.registry import instance_registry
 
 
 class LazySwitch(IoTSwitch):
-    def __init__(self, definition={}) -> None:
+    def __init__(self, definition={}):
         super().__init__(definition)
         self._on = 0
 
@@ -43,40 +43,32 @@ if sys.version_info >= (3, 8):
 
             scheduler = MicroScheduler()
             instance_registry["FakeAutomation"] = Automation()
-            instance_registry["FakeSwitch"] = IoTSwitch()
+            instance_registry["FakeSwitch"] = LazySwitch()
 
+            # Load the schedule
             schedule_file_path = os.path.join(os.path.dirname(__file__), 'schedule.yaml')
             scheduler.load_schedule(schedule_file_path)
 
-            self.assertTrue("FakeAutomation" in scheduler.schedule)
+            self.assertIn("FakeAutomation", scheduler.schedule)
             fake_automation_schedule = scheduler.schedule["FakeAutomation"]["schedule"]
-            self.assertTrue("monday" in fake_automation_schedule)
-            self.assertTrue("wednesday" in fake_automation_schedule)
-            self.assertTrue("friday" in fake_automation_schedule)
+            self.assertIn("monday", fake_automation_schedule)
+            self.assertIn("wednesday", fake_automation_schedule)
+            self.assertIn("friday", fake_automation_schedule)
 
-            mock_datetime.now.return_value = datetime(2024, 7, 19, 6)
-            await scheduler.run()
-            self.assertEqual(instance_registry["FakeSwitch"].on, 1)
+            # Test different scheduled times
+            times_to_test = [
+                (datetime(2024, 7, 19, 6, 0), 1),
+                (datetime(2024, 7, 19, 6, 15), 1),
+                (datetime(2024, 7, 19, 18, 0), 1),
+                (datetime(2024, 7, 19, 18, 30), 1),
+                (datetime(2024, 7, 19, 18, 45), 0),
+                (datetime(2024, 7, 19, 19, 0), 0),
+            ]
 
-            mock_datetime.now.return_value = datetime(2024, 7, 19, 7)
-            await scheduler.run()
-            self.assertEqual(instance_registry["FakeSwitch"].on, 1)
-
-            mock_datetime.now.return_value = datetime(2024, 7, 19, 8)
-            await scheduler.run()
-            self.assertEqual(instance_registry["FakeSwitch"].on, 1)
-
-            mock_datetime.now.return_value = datetime(2024, 7, 19, 18)
-            await scheduler.run()
-            self.assertEqual(instance_registry["FakeSwitch"].on, 0)
-
-            mock_datetime.now.return_value = datetime(2024, 7, 19, 19)
-            await scheduler.run()
-            self.assertEqual(instance_registry["FakeSwitch"].on, 0)
-
-            mock_datetime.now.return_value = datetime(2024, 7, 19, 20)
-            await scheduler.run()
-            self.assertEqual(instance_registry["FakeSwitch"].on, 0)
+            for mock_time, expected_on in times_to_test:
+                mock_datetime.now.return_value = mock_time
+                await scheduler.run()
+                self.assertEqual(instance_registry["FakeSwitch"].on, expected_on)
 
         @patch('micro_smart_hub.scheduler.datetime')
         async def test_scheduler_concurrent_execution(self, mock_datetime):
@@ -90,11 +82,12 @@ if sys.version_info >= (3, 8):
             instance_registry["Front_Light"] = LazySwitch()
             instance_registry["Garden_Light"] = LazySwitch()
 
+            # Load the schedule
             schedule_file_path = os.path.join(os.path.dirname(__file__), 'schedule.yaml')
             scheduler.load_schedule(schedule_file_path)
 
-            # Set the mock time to a point where both FakeAutomation and Irrigation should run
-            mock_datetime.now.return_value = datetime(2024, 7, 22, 6)
+            # Set the mock time to a point where all actions should run
+            mock_datetime.now.return_value = datetime(2024, 7, 22, 6, 0)
 
             # Verify the switch state
             self.assertEqual(instance_registry["Irrigation_Pump"].on, 0)
@@ -140,40 +133,32 @@ else:
 
             scheduler = MicroScheduler()
             instance_registry["FakeAutomation"] = Automation()
-            instance_registry["FakeSwitch"] = IoTSwitch()
+            instance_registry["FakeSwitch"] = LazySwitch()
 
+            # Load the schedule
             schedule_file_path = os.path.join(os.path.dirname(__file__), 'schedule.yaml')
             scheduler.load_schedule(schedule_file_path)
 
-            self.assertTrue("FakeAutomation" in scheduler.schedule)
+            self.assertIn("FakeAutomation", scheduler.schedule)
             fake_automation_schedule = scheduler.schedule["FakeAutomation"]["schedule"]
-            self.assertTrue("monday" in fake_automation_schedule)
-            self.assertTrue("wednesday" in fake_automation_schedule)
-            self.assertTrue("friday" in fake_automation_schedule)
+            self.assertIn("monday", fake_automation_schedule)
+            self.assertIn("wednesday", fake_automation_schedule)
+            self.assertIn("friday", fake_automation_schedule)
 
-            mock_datetime.now.return_value = datetime(2024, 7, 19, 6)
-            self.run_async(scheduler.run())
-            self.assertEqual(instance_registry["FakeSwitch"].on, 1)
+            # Test different scheduled times
+            times_to_test = [
+                (datetime(2024, 7, 19, 6, 0), 1),
+                (datetime(2024, 7, 19, 6, 15), 1),
+                (datetime(2024, 7, 19, 18, 0), 1),
+                (datetime(2024, 7, 19, 18, 30), 1),
+                (datetime(2024, 7, 19, 18, 45), 0),
+                (datetime(2024, 7, 19, 19, 0), 0),
+            ]
 
-            mock_datetime.now.return_value = datetime(2024, 7, 19, 7)
-            self.run_async(scheduler.run())
-            self.assertEqual(instance_registry["FakeSwitch"].on, 1)
-
-            mock_datetime.now.return_value = datetime(2024, 7, 19, 8)
-            self.run_async(scheduler.run())
-            self.assertEqual(instance_registry["FakeSwitch"].on, 1)
-
-            mock_datetime.now.return_value = datetime(2024, 7, 19, 18)
-            self.run_async(scheduler.run())
-            self.assertEqual(instance_registry["FakeSwitch"].on, 0)
-
-            mock_datetime.now.return_value = datetime(2024, 7, 19, 19)
-            self.run_async(scheduler.run())
-            self.assertEqual(instance_registry["FakeSwitch"].on, 0)
-
-            mock_datetime.now.return_value = datetime(2024, 7, 19, 20)
-            self.run_async(scheduler.run())
-            self.assertEqual(instance_registry["FakeSwitch"].on, 0)
+            for mock_time, expected_on in times_to_test:
+                mock_datetime.now.return_value = mock_time
+                self.run_async(scheduler.run())
+                self.assertEqual(instance_registry["FakeSwitch"].on, expected_on)
 
         @patch('micro_smart_hub.scheduler.datetime')
         def test_scheduler_concurrent_execution(self, mock_datetime):
@@ -187,11 +172,12 @@ else:
             instance_registry["Front_Light"] = LazySwitch()
             instance_registry["Garden_Light"] = LazySwitch()
 
+            # Load the schedule
             schedule_file_path = os.path.join(os.path.dirname(__file__), 'schedule.yaml')
             scheduler.load_schedule(schedule_file_path)
 
-            # Set the mock time to a point where both FakeAutomation and Irrigation should run
-            mock_datetime.now.return_value = datetime(2024, 7, 22, 6)
+            # Set the mock time to a point where all actions should run
+            mock_datetime.now.return_value = datetime(2024, 7, 22, 6, 0)
 
             # Verify the switch state
             self.assertEqual(instance_registry["Irrigation_Pump"].on, 0)

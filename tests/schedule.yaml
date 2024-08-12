@@ -1,19 +1,19 @@
 FakeAutomation:
   schedule:
     monday:
-      - hour: 6
+      - time: 6       # Without minutes (6:00)
         action: on
-      - hour: 18
+      - time: 18.30   # With minutes
         action: off
     wednesday:
-      - hour: 6
+      - time: "6:15"    # With minutes
         action: on
-      - hour: 18
+      - time: 18      # Without minutes (18:00)
         action: off
     friday:
-      - hour: 6
+      - time: 6       # Without minutes (6:00)
         action: on
-      - hour: 18
+      - time: 18.45   # With minutes
         action: off
   devices:
     - FakeSwitch
@@ -21,19 +21,19 @@ FakeAutomation:
 Irrigation:
   schedule:
     monday:
-      - hour: 6
+      - time: 6.00    # With minutes
         action: on
-      - hour: 18
+      - time: 18      # Without minutes (18:00)
         action: off
     wednesday:
-      - hour: 6
+      - time: 6       # Without minutes (6:00)
         action: on
-      - hour: 18
+      - time: "18:30"   # With minutes
         action: off
     friday:
-      - hour: 6
+      - time: 6.30    # With minutes
         action: on
-      - hour: 18
+      - time: 18      # Without minutes (18:00)
         action: off
   devices:
     - Irrigation_Pump
@@ -41,19 +41,19 @@ Irrigation:
 Garden_Lights:
   schedule:
     monday:
-      - hour: 6
+      - time: "6:00"    # With minutes
         action: on
-      - hour: 18
+      - time: 18      # Without minutes (18:00)
         action: off
     wednesday:
-      - hour: 6
+      - time: 6       # Without minutes (6:00)
         action: on
-      - hour: 18
+      - time: 18.45   # With minutes
         action: off
     friday:
-      - hour: 6
+      - time: 6.45    # With minutes
         action: on
-      - hour: 18
+      - time: 18      # Without minutes (18:00)
         action: off
   devices:
     - Garden_Light
@@ -61,19 +61,19 @@ Garden_Lights:
 Front_Lights:
   schedule:
     monday:
-      - hour: 6
+      - time: 6       # Without minutes (6:00)
         action: on
-      - hour: 18
+      - time: 18.15   # With minutes
         action: off
     wednesday:
-      - hour: 6
+      - time: "6:30"    # With minutes
         action: on
-      - hour: 18
+      - time: 18      # Without minutes (18:00)
         action: off
     friday:
-      - hour: 6
+      - time: 6       # Without minutes (6:00)
         action: on
-      - hour: 18
+      - time: 18.30   # With minutes
         action: off
   devices:
     - Front_Light

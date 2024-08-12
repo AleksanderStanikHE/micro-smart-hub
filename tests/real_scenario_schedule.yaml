@@ -1,0 +1,19 @@
+FakeAutomation_1:
+  schedule:
+    monday:
+      - time: 6       # Without minutes (6:00)
+        action: on
+      - time: 18.30   # With minutes
+        action: off
+    wednesday:
+      - time: "6:15"    # With minutes
+        action: on
+      - time: 18      # Without minutes (18:00)
+        action: off
+    friday:
+      - time: 6       # Without minutes (6:00)
+        action: on
+      - time: 18.45   # With minutes
+        action: off
+  devices:
+    - FakeSwitch_1

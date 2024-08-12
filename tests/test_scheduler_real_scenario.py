@@ -17,11 +17,11 @@ from micro_smart_hub.registry import instance_registry
 class TestMicroSchedulerRealScenario(unittest.TestCase):
 
     def setUp(self):
-        instance_registry["FakeAutomation"] = Automation()
-        instance_registry["FakeSwitch"] = IoTSwitch()
+        instance_registry["FakeAutomation_1"] = Automation()
+        instance_registry["FakeSwitch_1"] = IoTSwitch()
 
         self.scheduler = MicroScheduler()
-        schedule_file_path = os.path.join(os.path.dirname(__file__), 'schedule.yaml')
+        schedule_file_path = os.path.join(os.path.dirname(__file__), 'real_scenario_schedule.yaml')
         self.scheduler.load_schedule(schedule_file_path)
         self.runner = SchedulerRunner(self.scheduler)
 
@@ -40,22 +40,28 @@ class TestMicroSchedulerRealScenario(unittest.TestCase):
 
     @patch('micro_smart_hub.scheduler.datetime')
     def test_scheduler(self, mock_datetime):
+        instance_registry["FakeSwitch_1"].on = 0
         mock_datetime.strftime = datetime.strftime
 
         # Simulate a day's worth of schedule checks
-        start_time = datetime(2024, 7, 19, 6)
+        start_time = datetime(2024, 7, 19, 0)
 
+        on_time = start_time + timedelta(hours=6, minutes=0)
+        off_time = start_time + timedelta(hours=18, minutes=45)
         # Check the scheduler for each hour in a simulated day
         for hour_offset in range(0, 24):  # Simulate a full day
-            current_time = start_time + timedelta(hours=hour_offset)
-            mock_datetime.now.return_value = current_time
+            for minute_offset in range(0, 60):
+                current_time = start_time + timedelta(hours=hour_offset, minutes=minute_offset)
+                mock_datetime.now.return_value = current_time
 
-            # Allow some time for the scheduler to process (this is where you might wait for real I/O in a real test)
-            time.sleep(0.2)
-
-            # Check the switch state based on the expected schedule
-            expected_state = 1 if 6 <= current_time.hour < 18 else 0
-            self.assertEqual(instance_registry["FakeSwitch"].on, expected_state, f"Hour = {hour_offset}")
+                expected_state = 0
+                # Check the switch state based on the expected schedule
+                if on_time <= current_time < off_time:
+                    expected_state = 1
+                # Allow some time for the scheduler to process (this is where you might wait for real I/O in a real test)
+                time.sleep(0.01)
+                self.assertEqual(instance_registry["FakeSwitch_1"].on, expected_state, f"Hour = {hour_offset}:{minute_offset}")
+                # print(instance_registry["FakeSwitch_1"].on, expected_state, f"Hour = {hour_offset}:{minute_offset}")
 
 
 def suite():
