@@ -14,7 +14,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            # 'console_script_name = micro_smart_hub.module:function',
+            'micro-smart-server=micro_smart_server.micro_smart_server:main',
         ],
     },
     author="Aleksander Stanik (Olek)",

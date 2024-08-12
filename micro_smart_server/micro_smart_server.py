@@ -18,6 +18,21 @@ DEFAULT_CONFIG_FILE = './config.yaml'
 DEFAULT_SCHEDULE_FILE = './schedule.yaml'
 
 
+def parse_time_string(time_str):
+    """Parse the time string to return hours and minutes."""
+    if isinstance(time_str, int):
+        return time_str, 0  # Only hour is provided
+    elif isinstance(time_str, float):
+        hour = int(time_str)
+        minute = int(round((time_str - hour) * 100))
+        return hour, minute
+    elif isinstance(time_str, str) and ':' in time_str:
+        hour, minute = map(int, time_str.split(':'))
+        return hour, minute
+    else:
+        raise ValueError(f"Invalid time format: {time_str}")
+
+
 def find_next_tasks(scheduler):
     """Find the next tasks to be executed."""
     current_time = datetime.now()
@@ -33,7 +48,12 @@ def find_next_tasks(scheduler):
             tasks = automation_data.get('schedule', {}).get(day, [])
             devices = automation_data.get('devices', [])
             for task in tasks:
-                task_time = datetime.combine(current_time.date(), datetime.min.time()) + timedelta(days=day_offset, hours=task['hour'])
+                task_hour, task_minute = parse_time_string(task['time'])
+                task_time = datetime.combine(
+                    current_time.date(),
+                    datetime.min.time()
+                ) + timedelta(days=day_offset, hours=task_hour, minutes=task_minute)
+
                 if task_time > current_time:
                     if next_task_time is None or task_time < next_task_time:
                         next_task_time = task_time
@@ -58,10 +78,13 @@ async def update_display(stdscr, scheduler):
     curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)  # Pair 1: green text on a black background
 
     while True:
+        current_time = datetime.now()
+        current_day_name = current_time.strftime('%A')
+
         stdscr.clear()
         stdscr.addstr(0, 0, "Micro Smart Hub Scheduler")
         stdscr.addstr(1, 0, "==========================")
-        stdscr.addstr(2, 0, f"Current Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        stdscr.addstr(2, 0, f"Current Time: {current_time.strftime('%Y-%m-%d %H:%M:%S')} ({current_day_name})")
         stdscr.addstr(3, 0, "Press ")
         stdscr.addstr("Ctrl+C", curses.color_pair(1))
         stdscr.addstr(" to stop the scheduler")

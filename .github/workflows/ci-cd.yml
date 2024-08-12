@@ -15,7 +15,7 @@ on:
       - 'feature/**'  # Run on pull requests to any feature branch
 
 jobs:
-  build:
+  tests:
     runs-on: ubuntu-latest
 
     strategy:
@@ -44,6 +44,46 @@ jobs:
     - name: Run tests
       run: |
         python -m unittest discover -s tests  # Discover and run tests in the tests directory
+
+  build:
+    runs-on: ubuntu-latest
+    needs: tests
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8, 3.9, 3.10, 3.11]  # Test against multiple Python versions
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2  # Check out the repository
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}  # Set up the specified Python version
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt  # Install dependencies from requirements.txt
+
+      - name: Install build tools
+        run: |
+          pip install setuptools wheel
+
+      - name: Build the package
+        run: |
+          python setup.py sdist bdist_wheel
+
+      - name: Test execution of micro-smart-server
+        run: |
+          python -m pip install dist/*.whl  # Install the package locally
+          micro-smart-server --help  # Verify that the command runs
+
+      - name: Archive build artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: build-artifacts
+          path: dist/*
 
   deploy:
     runs-on: ubuntu-latest

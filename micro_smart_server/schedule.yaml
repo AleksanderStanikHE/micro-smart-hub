@@ -1,24 +1,24 @@
 Task_1:
   schedule:
     monday:
-      - hour: 6
+      - time: "6:31"
         action: on
-      - hour: 18
+      - time: 18.31
         action: off
     wednesday:
-      - hour: 6
+      - time: 6
         action: on
-      - hour: 18
+      - time: 18
         action: off
     friday:
-      - hour: 6
+      - time: 6
         action: on
-      - hour: 18
+      - time: 18
         action: off
     sunday:
-      - hour: 6
+      - time: 6
         action: on
-      - hour: 18
+      - time: 18
         action: off        
   devices:
     - Switch_1
@@ -26,24 +26,24 @@ Task_1:
 Task_2:
   schedule:
     monday:
-      - hour: 6
+      - time: 6.31
         action: on
-      - hour: 18
+      - time: "18:31"
         action: off
     wednesday:
-      - hour: 6
+      - time: 6
         action: on
-      - hour: 18
+      - time: 18
         action: off
     friday:
-      - hour: 6
+      - time: 6
         action: on
-      - hour: 18
+      - time: 18
         action: off
     sunday:
-      - hour: 6
+      - time: 6
         action: on
-      - hour: 18
+      - time: 18
         action: off        
   devices:
     - Switch_2
@@ -51,24 +51,24 @@ Task_2:
 Task_3:
   schedule:
     monday:
-      - hour: 6
+      - time: 6
         action: on
-      - hour: 18
+      - time: 18.32
         action: off
     wednesday:
-      - hour: 6
+      - time: 6
         action: on
-      - hour: 18
+      - time: 18
         action: off
     friday:
-      - hour: 6
+      - time: 6
         action: on
-      - hour: 16
+      - time: 16
         action: off
     sunday:
-      - hour: 6
+      - time: 6
         action: on
-      - hour: 18
+      - time: 18
         action: off        
   devices:
     - Switch_3
