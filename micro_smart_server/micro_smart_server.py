@@ -1,8 +1,3 @@
-import sys
-import os
-sys.path.append(os.path.abspath(os.path.dirname(os.path.dirname(__file__))))
-
-
 import asyncio
 import curses
 import argparse
@@ -73,10 +68,6 @@ def find_next_tasks(scheduler):
 async def update_display(stdscr, scheduler):
     """Coroutine to update the display in an asynchronous loop."""
 
-    # Initialize colors
-    curses.start_color()
-    curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)  # Pair 1: green text on a black background
-
     while True:
         current_time = datetime.now()
         current_day_name = current_time.strftime('%A')
@@ -85,9 +76,7 @@ async def update_display(stdscr, scheduler):
         stdscr.addstr(0, 0, "Micro Smart Hub Scheduler")
         stdscr.addstr(1, 0, "==========================")
         stdscr.addstr(2, 0, f"Current Time: {current_time.strftime('%Y-%m-%d %H:%M:%S')} ({current_day_name})")
-        stdscr.addstr(3, 0, "Press ")
-        stdscr.addstr("Ctrl+C", curses.color_pair(1))
-        stdscr.addstr(" to stop the scheduler")
+        stdscr.addstr(3, 0, "Press Ctrl+C to stop the scheduler")
 
         # Find and display the next scheduled tasks with actions
         next_tasks, next_task_time, time_to_next_task = find_next_tasks(scheduler)
@@ -108,16 +97,20 @@ async def update_display(stdscr, scheduler):
         stdscr.addstr(next_section_start, 0, "Currently loaded automations:")
         automations = scheduler.schedule.keys()
         automation_filtered_registry = filter_instances_by_base_class(Automation)
-        for idx, automation in enumerate(automations, start=next_section_start + 1):
-            stdscr.addstr(idx, 0, f"- {automation} : {automation_filtered_registry[automation].definition}")
+        for idx, automation_name in enumerate(automations, start=next_section_start + 1):
+            automation = automation_filtered_registry.get(automation_name, None)
+            if automation:
+                if hasattr(automation, 'definition'):
+                    stdscr.addstr(idx, 0, f"- {automation_name} : {automation.definition}")
 
         # Display loaded devices
         stdscr.addstr(idx + 2, 0, "Currently loaded devices:")
         devices_idx = idx + 3
         device_filtered_registry = filter_instances_by_base_class(MicroDevice)
         for device_name, device in device_filtered_registry.items():
-            stdscr.addstr(devices_idx, 0, f"- {device_name} : {device.definition}")
-            devices_idx += 1
+            if hasattr(device, 'definition'):
+                stdscr.addstr(devices_idx, 0, f"- {device_name} : {device.definition}")
+                devices_idx += 1
 
         stdscr.refresh()
         await asyncio.sleep(1)  # Update every second for demo purposes
