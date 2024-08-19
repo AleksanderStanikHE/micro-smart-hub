@@ -37,7 +37,7 @@ if sys.version_info >= (3, 8):
             self.assertIsInstance(scheduler, MicroScheduler)
             self.assertIsInstance(scheduler.schedule, dict)
 
-        @patch('micro_smart_hub.scheduler.datetime')
+        @patch('micro_smart_hub.scheduler.datetime', wraps=datetime)
         async def test_scheduler(self, mock_datetime):
             mock_datetime.strftime = datetime.strftime
 
@@ -70,7 +70,7 @@ if sys.version_info >= (3, 8):
                 await scheduler.run()
                 self.assertEqual(instance_registry["FakeSwitch"].on, expected_on)
 
-        @patch('micro_smart_hub.scheduler.datetime')
+        @patch('micro_smart_hub.scheduler.datetime', wraps=datetime)
         async def test_scheduler_concurrent_execution(self, mock_datetime):
             mock_datetime.strftime = datetime.strftime
 
@@ -107,6 +107,42 @@ if sys.version_info >= (3, 8):
             # Assert that the elapsed time is within an acceptable range
             self.assertLess(elapsed_time, 3, "Scheduler run took too long")
 
+        @patch('micro_smart_hub.scheduler.datetime', wraps=datetime)
+        async def test_scheduler_run_missed_tasks(self, mock_datetime):
+            """Test that tasks are run even if the scheduler starts after the task time."""
+            mock_datetime.strftime = datetime.strftime
+
+            scheduler = MicroScheduler()
+            instance_registry["FakeAutomation"] = Automation()
+            instance_registry["FakeSwitch"] = LazySwitch()
+
+            # Load the schedule
+            schedule_file_path = os.path.join(os.path.dirname(__file__), 'schedule.yaml')
+            scheduler.load_schedule(schedule_file_path)
+
+            # Test scheduler starting after the scheduled task time
+
+            mock_datetime.now.return_value = datetime(2024, 7, 19, 3, 15)
+            await scheduler.run()
+            self.assertEqual(instance_registry["FakeSwitch"].on, 0)
+
+            mock_datetime.now.return_value = datetime(2024, 7, 19, 6, 1)
+            await scheduler.run()
+            self.assertEqual(instance_registry["FakeSwitch"].on, 1)
+
+            mock_datetime.now.return_value = datetime(2024, 7, 19, 6, 50)
+            await scheduler.run()
+            self.assertEqual(instance_registry["FakeSwitch"].on, 0)
+
+            mock_datetime.now.return_value = datetime(2024, 7, 19, 18, 30)
+            await scheduler.run()
+            self.assertEqual(instance_registry["FakeSwitch"].on, 1)
+
+            mock_datetime.now.return_value = datetime(2024, 7, 19, 18, 50)
+            await scheduler.run()
+            self.assertEqual(instance_registry["FakeSwitch"].on, 0)
+
+
 else:
     import asyncio
 
@@ -127,7 +163,7 @@ else:
             self.assertIsInstance(scheduler, MicroScheduler)
             self.assertIsInstance(scheduler.schedule, dict)
 
-        @patch('micro_smart_hub.scheduler.datetime')
+        @patch('micro_smart_hub.scheduler.datetime', wraps=datetime)
         def test_scheduler(self, mock_datetime):
             mock_datetime.strftime = datetime.strftime
 
@@ -160,7 +196,7 @@ else:
                 self.run_async(scheduler.run())
                 self.assertEqual(instance_registry["FakeSwitch"].on, expected_on)
 
-        @patch('micro_smart_hub.scheduler.datetime')
+        @patch('micro_smart_hub.scheduler.datetime', wraps=datetime)
         def test_scheduler_concurrent_execution(self, mock_datetime):
             mock_datetime.strftime = datetime.strftime
 
@@ -197,12 +233,48 @@ else:
             # Assert that the elapsed time is within an acceptable range
             self.assertLess(elapsed_time, 3, "Scheduler run took too long")
 
+        @patch('micro_smart_hub.scheduler.datetime', wraps=datetime)
+        def test_scheduler_run_missed_tasks(self, mock_datetime):
+            """Test that tasks are run even if the scheduler starts after the task time."""
+            mock_datetime.strftime = datetime.strftime
+
+            scheduler = MicroScheduler()
+            instance_registry["FakeAutomation"] = Automation()
+            instance_registry["FakeSwitch"] = LazySwitch()
+
+            # Load the schedule
+            schedule_file_path = os.path.join(os.path.dirname(__file__), 'schedule.yaml')
+            scheduler.load_schedule(schedule_file_path)
+
+            # Test scheduler starting after the scheduled task time
+
+            mock_datetime.now.return_value = datetime(2024, 7, 19, 3, 15)
+            self.run_async(scheduler.run())
+            self.assertEqual(instance_registry["FakeSwitch"].on, 0)
+
+            mock_datetime.now.return_value = datetime(2024, 7, 19, 6, 1)
+            self.run_async(scheduler.run())
+            self.assertEqual(instance_registry["FakeSwitch"].on, 1)
+
+            mock_datetime.now.return_value = datetime(2024, 7, 19, 6, 50)
+            self.run_async(scheduler.run())
+            self.assertEqual(instance_registry["FakeSwitch"].on, 0)
+
+            mock_datetime.now.return_value = datetime(2024, 7, 19, 18, 30)
+            self.run_async(scheduler.run())
+            self.assertEqual(instance_registry["FakeSwitch"].on, 1)
+
+            mock_datetime.now.return_value = datetime(2024, 7, 19, 18, 50)
+            self.run_async(scheduler.run())
+            self.assertEqual(instance_registry["FakeSwitch"].on, 0)
+
 
 def suite():
     suite = unittest.TestSuite()
     suite.addTest(TestMicroScheduler('test_scheduler_init'))
     suite.addTest(TestMicroScheduler('test_scheduler'))
     suite.addTest(TestMicroScheduler('test_scheduler_concurrent_execution'))
+    suite.addTest(TestMicroScheduler('test_scheduler_run_missed_tasks'))
     return suite
 
 

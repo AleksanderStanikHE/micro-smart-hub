@@ -13,6 +13,10 @@ FakeAutomation:
     friday:
       - time: 6       # Without minutes (6:00)
         action: on
+      - time: 6.30       # Without minutes (6:00)
+        action: off
+      - time: 18   # With minutes
+        action: on
       - time: 18.45   # With minutes
         action: off
   devices:

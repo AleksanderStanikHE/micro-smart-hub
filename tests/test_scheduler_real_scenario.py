@@ -38,7 +38,7 @@ class TestMicroSchedulerRealScenario(unittest.TestCase):
         """Function to run the scheduler in a separate thread."""
         asyncio.run(self.runner.run_forever())
 
-    @patch('micro_smart_hub.scheduler.datetime')
+    @patch('micro_smart_hub.scheduler.datetime', wraps=datetime)
     def test_scheduler(self, mock_datetime):
         instance_registry["FakeSwitch_1"].on = 0
         mock_datetime.strftime = datetime.strftime
