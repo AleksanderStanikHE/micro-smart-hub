@@ -13,3 +13,11 @@ SmartIrrigation:
   parameters:
     latitude: 12.24541322
     longitude: 32.32243421
+
+DailyAutomation:
+  class: Automation
+
+Daily_Switch:
+  class: SwitchBox
+  parameters:
+    url: 192.168.0.197

@@ -12,7 +12,7 @@ class Automation(abc.ABC):
         self.devices: List[MicroDevice] = None
         self.last_run_time: datetime = None
 
-    def run(self, action, parameters, devices) -> None:
+    def run(self, action, parameters, devices, scheduler=None) -> None:
         for device in devices:
             if isinstance(action, bool):
                 if isinstance(device, IoTSwitch):

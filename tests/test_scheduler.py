@@ -142,6 +142,66 @@ if sys.version_info >= (3, 8):
             await scheduler.run()
             self.assertEqual(instance_registry["FakeSwitch"].on, 0)
 
+        @patch('micro_smart_hub.scheduler.datetime', wraps=datetime)
+        async def test_scheduler_run_missed_background_tasks(self, mock_datetime):
+            mock_datetime.strftime = datetime.strftime
+
+            scheduler = MicroScheduler()
+            instance_registry["DailyAutomation"] = Automation()
+            instance_registry["Daily_Switch"] = LazySwitch()
+
+            # Load the schedule
+            schedule_file_path = os.path.join(os.path.dirname(__file__), 'schedule.yaml')
+            scheduler.load_schedule(schedule_file_path)
+
+            # Test scheduler starting after the scheduled task time
+            mock_datetime.now.return_value = datetime(2024, 7, 19, 2, 15)
+            await scheduler.run()
+            self.assertEqual(instance_registry["Daily_Switch"].on, 0)
+
+            mock_datetime.now.return_value = datetime(2024, 7, 19, 3, 15)
+            await scheduler.run()
+            self.assertEqual(instance_registry["Daily_Switch"].on, 1)
+
+            mock_datetime.now.return_value = datetime(2024, 7, 19, 4, 15)
+            await scheduler.run()
+            self.assertEqual(instance_registry["Daily_Switch"].on, 0)
+
+            # Test scheduler starting after the scheduled task time
+            mock_datetime.now.return_value = datetime(2024, 7, 20, 2, 15)
+            await scheduler.run()
+            self.assertEqual(instance_registry["Daily_Switch"].on, 0)
+
+            mock_datetime.now.return_value = datetime(2024, 7, 20, 3, 15)
+            await scheduler.run()
+            self.assertEqual(instance_registry["Daily_Switch"].on, 1)
+
+            mock_datetime.now.return_value = datetime(2024, 7, 20, 4, 15)
+            await scheduler.run()
+            self.assertEqual(instance_registry["Daily_Switch"].on, 0)
+
+        @patch('micro_smart_hub.scheduler.datetime', wraps=datetime)
+        async def test_scheduler_run_background_tasks(self, mock_datetime):
+            mock_datetime.strftime = datetime.strftime
+
+            scheduler = MicroScheduler()
+            instance_registry["BackgroundAutomation"] = Automation()
+            instance_registry["Cont_Switch"] = LazySwitch()
+
+            self.assertEqual(instance_registry["Cont_Switch"].on, 0)
+
+            # Load the schedule
+            schedule_file_path = os.path.join(os.path.dirname(__file__), 'schedule.yaml')
+            scheduler.load_schedule(schedule_file_path)
+
+            # Test scheduler starting after the scheduled task time
+            mock_datetime.now.return_value = datetime(2024, 7, 19, 2, 15)
+            await scheduler.run()
+            self.assertEqual(instance_registry["Cont_Switch"].on, 1)
+
+            mock_datetime.now.return_value = datetime(2024, 7, 12, 18, 43)
+            await scheduler.run()
+            self.assertEqual(instance_registry["Cont_Switch"].on, 1)
 
 else:
     import asyncio
@@ -268,6 +328,67 @@ else:
             self.run_async(scheduler.run())
             self.assertEqual(instance_registry["FakeSwitch"].on, 0)
 
+        @patch('micro_smart_hub.scheduler.datetime', wraps=datetime)
+        def test_scheduler_run_missed_background_tasks(self, mock_datetime):
+            mock_datetime.strftime = datetime.strftime
+
+            scheduler = MicroScheduler()
+            instance_registry["DailyAutomation"] = Automation()
+            instance_registry["Daily_Switch"] = LazySwitch()
+
+            # Load the schedule
+            schedule_file_path = os.path.join(os.path.dirname(__file__), 'schedule.yaml')
+            scheduler.load_schedule(schedule_file_path)
+
+            # Test scheduler starting after the scheduled task time
+            mock_datetime.now.return_value = datetime(2024, 7, 19, 2, 15)
+            self.run_async(scheduler.run())
+            self.assertEqual(instance_registry["Daily_Switch"].on, 0)
+
+            mock_datetime.now.return_value = datetime(2024, 7, 19, 3, 15)
+            self.run_async(scheduler.run())
+            self.assertEqual(instance_registry["Daily_Switch"].on, 1)
+
+            mock_datetime.now.return_value = datetime(2024, 7, 19, 4, 15)
+            self.run_async(scheduler.run())
+            self.assertEqual(instance_registry["Daily_Switch"].on, 0)
+
+            # Test scheduler starting after the scheduled task time
+            mock_datetime.now.return_value = datetime(2024, 7, 20, 2, 15)
+            self.run_async(scheduler.run())
+            self.assertEqual(instance_registry["Daily_Switch"].on, 0)
+
+            mock_datetime.now.return_value = datetime(2024, 7, 20, 3, 15)
+            self.run_async(scheduler.run())
+            self.assertEqual(instance_registry["Daily_Switch"].on, 1)
+
+            mock_datetime.now.return_value = datetime(2024, 7, 20, 4, 15)
+            self.run_async(scheduler.run())
+            self.assertEqual(instance_registry["Daily_Switch"].on, 0)
+
+        @patch('micro_smart_hub.scheduler.datetime', wraps=datetime)
+        def test_scheduler_run_background_tasks(self, mock_datetime):
+            mock_datetime.strftime = datetime.strftime
+
+            scheduler = MicroScheduler()
+            instance_registry["BackgroundAutomation"] = Automation()
+            instance_registry["Cont_Switch"] = LazySwitch()
+
+            self.assertEqual(instance_registry["Cont_Switch"].on, 0)
+
+            # Load the schedule
+            schedule_file_path = os.path.join(os.path.dirname(__file__), 'schedule.yaml')
+            scheduler.load_schedule(schedule_file_path)
+
+            # Test scheduler starting after the scheduled task time
+            mock_datetime.now.return_value = datetime(2024, 7, 19, 2, 15)
+            self.run_async(scheduler.run())
+            self.assertEqual(instance_registry["Cont_Switch"].on, 1)
+
+            mock_datetime.now.return_value = datetime(2024, 7, 12, 18, 43)
+            self.run_async(scheduler.run())
+            self.assertEqual(instance_registry["Cont_Switch"].on, 1)
+
 
 def suite():
     suite = unittest.TestSuite()
@@ -275,6 +396,8 @@ def suite():
     suite.addTest(TestMicroScheduler('test_scheduler'))
     suite.addTest(TestMicroScheduler('test_scheduler_concurrent_execution'))
     suite.addTest(TestMicroScheduler('test_scheduler_run_missed_tasks'))
+    suite.addTest(TestMicroScheduler('test_scheduler_run_missed_background_tasks'))
+    suite.addTest(TestMicroScheduler('test_scheduler_run_background_tasks'))
     return suite
 
 

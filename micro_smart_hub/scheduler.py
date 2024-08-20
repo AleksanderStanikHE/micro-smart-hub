@@ -87,6 +87,8 @@ class MicroScheduler:
         for day_name, scheduled_tasks_per_day in schedule_tasks.items():
             for task in scheduled_tasks_per_day:
                 task_hour, task_minute = self.parse_task_time(task['time'])
+                if day_name == 'daily':
+                    day_name = current_time.strftime('%A').lower()
                 task_time = self.get_datetime_for_day(day_name, task_hour, task_minute)
                 if task_time <= current_time:
                     if last_time is None:
@@ -103,21 +105,18 @@ class MicroScheduler:
         Automations = filter_instances_by_base_class(Automation)
         automation = Automations[automation_name]
         tasks = []
-        schedule_tasks = automation_data.get('schedule', {})  # .get(current_day, [])
+        schedule_tasks = automation_data.get('schedule', {})
         devices_names = automation_data.get('devices', [])
         devices = [Devices.get(device_name, None) for device_name in devices_names]
 
-        last_task, last_time = self.find_first_task_before(schedule_tasks, current_time)
-
-        # for task in schedule_tasks:
-        #     task_hour, task_minute = self.parse_task_time(task['time'])
-        #     task_time = current_time.replace(hour=task_hour, minute=task_minute, second=0, microsecond=0)
-
-        # Check if the task time falls within the range between start_time and end_time
-        #    if task_time <= current_time:
+        if schedule_tasks:
+            last_task, last_time = self.find_first_task_before(schedule_tasks, current_time)
+        else:
+            last_task = automation_data
+            last_time = current_time
 
         if automation.last_run_time != last_time:
-            action = last_task['action']
+            action = last_task.get('action', None)
             parameters = last_task.get('parameters', {})
             parameters["current_hour"] = last_time.hour
             parameters["current_minute"] = last_time.minute
@@ -163,7 +162,8 @@ class MicroScheduler:
                     automation.run,  # This is the synchronous method
                     action,          # Pass the arguments
                     parameters,
-                    devices
+                    devices,
+                    self  # main scheduler instance
                 )
             except Exception as e:
                 print(f"Error executing task for {automation}: {e}")

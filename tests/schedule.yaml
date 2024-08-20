@@ -81,3 +81,18 @@ Front_Lights:
         action: off
   devices:
     - Front_Light
+
+DailyAutomation:
+  schedule:
+    daily:
+      - time: "03:00"
+        action: on
+      - time: "04:00"
+        action: off
+  devices:
+    - Daily_Switch
+
+BackgroundAutomation:
+  action: on
+  devices:
+    - Cont_Switch

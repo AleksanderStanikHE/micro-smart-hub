@@ -53,7 +53,7 @@ class Irrigation(Automation):
                 return True
         return False
 
-    def run(self, action, parameters, devices) -> None:
+    def run(self, action, parameters, devices, scheduler=None) -> None:
         current_hour = parameters["current_hour"]
         current_date = datetime.now()
         start_date = current_date.strftime("%Y-%m-%d")
