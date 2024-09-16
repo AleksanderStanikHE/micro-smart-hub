@@ -70,10 +70,10 @@ class TestSwitchBox(unittest.TestCase):
 
     @patch('requests.post')
     @patch('requests.get')
-    def test_switchbox_init(self, mock_get: Mock, mock_post: Mock):
+    def test_01_switchbox_init(self, mock_get: Mock, mock_post: Mock):
 
         mock_get.side_effect = my_side_effect
-        switch_box = SwitchBox(switchbox_definiton)
+        switch_box = SwitchBox(**switchbox_definiton)
         switch_box.start()
 
         self.assertIsInstance(switch_box.info["deviceName"], str)
@@ -88,9 +88,9 @@ class TestSwitchBox(unittest.TestCase):
 
     @patch('requests.post')
     @patch('requests.get')
-    def test_switchbox_call(self, mock_get: Mock, mock_post: Mock):
+    def test_02_switchbox_call(self, mock_get: Mock, mock_post: Mock):
         mock_get.side_effect = my_side_effect
-        switch_box = SwitchBox(switchbox_definiton)
+        switch_box = SwitchBox(**switchbox_definiton)
         switch_box.start()
 
         # Simulate successful communication initially
@@ -123,9 +123,9 @@ class TestSwitchBox(unittest.TestCase):
 
     @patch('requests.post')
     @patch('requests.get')
-    def test_switchbox_no_device(self, mock_get, mock_post):
+    def test_03_switchbox_no_device(self, mock_get, mock_post):
         mock_get.side_effect = my_side_effect
-        switch_box = SwitchBox(switchbox_definiton)
+        switch_box = SwitchBox(**switchbox_definiton)
         switch_box.start()
 
         mock_get.side_effect = exception_with_sleep
@@ -136,10 +136,10 @@ class TestSwitchBox(unittest.TestCase):
 
     @patch('requests.post')
     @patch('requests.get')
-    def test_switch_broken_communication(self, mock_get, mock_post):
+    def test_04_switch_broken_communication(self, mock_get, mock_post):
         switch_box_state["relays"][0]['state'] = 14
         mock_get.side_effect = my_side_effect
-        switch_box = SwitchBox(switchbox_definiton)
+        switch_box = SwitchBox(**switchbox_definiton)
         switch_box.start()
 
         error_message = (
@@ -184,10 +184,10 @@ class TestSwitchBox(unittest.TestCase):
 
 def suite():
     suite = unittest.TestSuite()
-    suite.addTest(TestSwitchBox('test_switchbox_init'))
-    suite.addTest(TestSwitchBox('test_switchbox_call'))
-    suite.addTest(TestSwitchBox('test_switchbox_no_device'))
-    suite.addTest(TestSwitchBox('test_switch_broken_communication'))
+    suite.addTest(TestSwitchBox('test_01_switchbox_init'))
+    suite.addTest(TestSwitchBox('test_02_switchbox_call'))
+    suite.addTest(TestSwitchBox('test_03_switchbox_no_device'))
+    suite.addTest(TestSwitchBox('test_04_switch_broken_communication'))
     return suite
 
 

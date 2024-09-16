@@ -2,15 +2,15 @@ import numpy as np
 import requests
 from datetime import datetime, timedelta
 from micro_smart_hub.automation import Automation
-from micro_smart_hub.registry import register_class
+from micro_registry.registry import register_class
 
 
 @register_class
 class Irrigation(Automation):
-    def __init__(self, definition={}) -> None:
-        super().__init__(definition)
-        self.latitude = self.definition.get("latitude", 0.0)
-        self.longitude = self.definition.get("longitude", 0.0)
+    def __init__(self, latitude, longitude) -> None:
+        super().__init__()
+        self.latitude = latitude
+        self.longitude = longitude
         self.soil_moisture_threshold = 0.2
         self.wind_threshold = 4.0
         self.wind_data = np.zeros(72)

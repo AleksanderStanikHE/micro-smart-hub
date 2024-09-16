@@ -37,7 +37,7 @@ class TestIrrigation(unittest.TestCase):
 
     @patch('micro_smart_hub.automations.irrigation.datetime')
     def test_irrigation_run(self, mock_datetime: Mock):
-        irrigation = Irrigation(irrigation_definition)
+        irrigation = Irrigation(**irrigation_definition)
         for key, params in irrigation_scenarios.items():
             mock_datetime.now.return_value = datetime.strptime(params["date"], "%Y-%m-%d")
             hour = params["hour"]

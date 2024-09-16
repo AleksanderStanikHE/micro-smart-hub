@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor
 from micro_smart_hub.automation import Automation
 from micro_smart_hub.device import MicroDevice
-from micro_smart_hub.registry import filter_instances_by_base_class
+from micro_registry.registry import filter_instances_by_base_class
 
 
 class MicroScheduler:

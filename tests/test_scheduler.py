@@ -9,12 +9,12 @@ from unittest.mock import patch
 from micro_smart_hub.scheduler import MicroScheduler
 from micro_smart_hub.automation import Automation
 from micro_smart_hub.device import IoTSwitch
-from micro_smart_hub.registry import instance_registry
+from micro_registry.registry import instance_registry, class_registry
 
 
 class LazySwitch(IoTSwitch):
-    def __init__(self, definition={}):
-        super().__init__(definition)
+    def __init__(self):
+        super().__init__()
         self._on = 0
 
     @property
@@ -32,13 +32,15 @@ if sys.version_info >= (3, 8):
 
     class TestMicroScheduler(unittest.IsolatedAsyncioTestCase):
 
-        def test_scheduler_init(self):
+        def test_01_scheduler_init(self):
+            instance_registry.clear()
+            class_registry.clear()
             scheduler = MicroScheduler()
             self.assertIsInstance(scheduler, MicroScheduler)
             self.assertIsInstance(scheduler.schedule, dict)
 
         @patch('micro_smart_hub.scheduler.datetime', wraps=datetime)
-        async def test_scheduler(self, mock_datetime):
+        async def test_02_scheduler(self, mock_datetime):
             mock_datetime.strftime = datetime.strftime
 
             scheduler = MicroScheduler()
@@ -71,7 +73,7 @@ if sys.version_info >= (3, 8):
                 self.assertEqual(instance_registry["FakeSwitch"].on, expected_on)
 
         @patch('micro_smart_hub.scheduler.datetime', wraps=datetime)
-        async def test_scheduler_concurrent_execution(self, mock_datetime):
+        async def test_03_scheduler_concurrent_execution(self, mock_datetime):
             mock_datetime.strftime = datetime.strftime
 
             scheduler = MicroScheduler()
@@ -108,7 +110,7 @@ if sys.version_info >= (3, 8):
             self.assertLess(elapsed_time, 3, "Scheduler run took too long")
 
         @patch('micro_smart_hub.scheduler.datetime', wraps=datetime)
-        async def test_scheduler_run_missed_tasks(self, mock_datetime):
+        async def test_04_scheduler_run_missed_tasks(self, mock_datetime):
             """Test that tasks are run even if the scheduler starts after the task time."""
             mock_datetime.strftime = datetime.strftime
 
@@ -143,7 +145,7 @@ if sys.version_info >= (3, 8):
             self.assertEqual(instance_registry["FakeSwitch"].on, 0)
 
         @patch('micro_smart_hub.scheduler.datetime', wraps=datetime)
-        async def test_scheduler_run_missed_background_tasks(self, mock_datetime):
+        async def test_05_scheduler_run_missed_background_tasks(self, mock_datetime):
             mock_datetime.strftime = datetime.strftime
 
             scheduler = MicroScheduler()
@@ -181,7 +183,7 @@ if sys.version_info >= (3, 8):
             self.assertEqual(instance_registry["Daily_Switch"].on, 0)
 
         @patch('micro_smart_hub.scheduler.datetime', wraps=datetime)
-        async def test_scheduler_run_background_tasks(self, mock_datetime):
+        async def test_06_scheduler_run_background_tasks(self, mock_datetime):
             mock_datetime.strftime = datetime.strftime
 
             scheduler = MicroScheduler()
@@ -392,12 +394,12 @@ else:
 
 def suite():
     suite = unittest.TestSuite()
-    suite.addTest(TestMicroScheduler('test_scheduler_init'))
-    suite.addTest(TestMicroScheduler('test_scheduler'))
-    suite.addTest(TestMicroScheduler('test_scheduler_concurrent_execution'))
-    suite.addTest(TestMicroScheduler('test_scheduler_run_missed_tasks'))
-    suite.addTest(TestMicroScheduler('test_scheduler_run_missed_background_tasks'))
-    suite.addTest(TestMicroScheduler('test_scheduler_run_background_tasks'))
+    suite.addTest(TestMicroScheduler('test_01_scheduler_init'))
+    suite.addTest(TestMicroScheduler('test_02_scheduler'))
+    suite.addTest(TestMicroScheduler('test_03_scheduler_concurrent_execution'))
+    suite.addTest(TestMicroScheduler('test_04_scheduler_run_missed_tasks'))
+    suite.addTest(TestMicroScheduler('test_05_scheduler_run_missed_background_tasks'))
+    suite.addTest(TestMicroScheduler('test_06_scheduler_run_background_tasks'))
     return suite
 
 

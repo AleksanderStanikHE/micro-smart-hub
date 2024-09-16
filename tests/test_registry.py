@@ -5,7 +5,7 @@ sys.path.append(os.path.abspath(os.path.dirname(os.path.dirname(__file__))))
 import unittest
 from micro_smart_hub.automation import Automation
 from micro_smart_hub.device import MicroDevice
-from micro_smart_hub.registry import load_modules_from_directory, class_registry, create_instance, load_instances_from_yaml, instance_registry, filter_instances_by_base_class
+from micro_registry.registry import load_modules_from_directory, class_registry, create_instance, instance_registry, load_instances_from_yaml, filter_instances_by_base_class
 
 
 irrigation_definition = {
@@ -20,7 +20,7 @@ switchbox_definiton = {
 
 class TestRegistry(unittest.TestCase):
 
-    def test_class_registry(self):
+    def test_01_class_registry(self):
         load_modules_from_directory('micro_smart_hub/automations')
         self.assertTrue("Irrigation" in class_registry)
         load_modules_from_directory('micro_smart_hub/devices/blebox')
@@ -34,7 +34,7 @@ class TestRegistry(unittest.TestCase):
         self.assertTrue(switchbox is not None)
         self.assertIsInstance(switchbox, MicroDevice)
 
-    def test_instance_registry(self):
+    def test_02_instance_registry(self):
         load_modules_from_directory('micro_smart_hub/automations')
         load_modules_from_directory('micro_smart_hub/devices')
 
@@ -51,8 +51,8 @@ class TestRegistry(unittest.TestCase):
 
 def suite():
     suite = unittest.TestSuite()
-    suite.addTest(TestRegistry('test_class_registry'))
-    suite.addTest(TestRegistry('test_instance_registry'))
+    suite.addTest(TestRegistry('test_01_class_registry'))
+    suite.addTest(TestRegistry('test_02_instance_registry'))
     return suite
 
 

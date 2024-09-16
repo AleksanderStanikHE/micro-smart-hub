@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 from micro_smart_hub.scheduler import MicroScheduler, SchedulerRunner
 from micro_smart_hub.automation import Automation
 from micro_smart_hub.device import IoTSwitch
-from micro_smart_hub.registry import instance_registry
+from micro_registry.registry import instance_registry
 
 
 class TestMicroSchedulerRealScenario(unittest.TestCase):

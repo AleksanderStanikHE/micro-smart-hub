@@ -8,7 +8,7 @@ from unittest.mock import patch, Mock
 from micro_smart_hub.automations.irrigation import Irrigation
 from micro_smart_hub.scheduler import MicroScheduler
 from micro_smart_hub.devices.blebox.switchbox import SwitchBox
-from micro_smart_hub.registry import instance_registry
+from micro_registry.registry import instance_registry
 
 irrigation_scenarios = {
     "Wind_OK_SoilMoisture_WRONG": {
@@ -96,8 +96,8 @@ class TestIrrigationSwitchBoxSmartHome(unittest.TestCase):
         mock_get.get.side_effect = my_side_effect
         smart_home = MicroScheduler()
 
-        instance_registry["Irrigation"] = Irrigation(irrigation_definition)
-        instance_registry["Pump"] = SwitchBox(switchbox_definiton)
+        instance_registry["Irrigation"] = Irrigation(**irrigation_definition)
+        instance_registry["Pump"] = SwitchBox(**switchbox_definiton)
         schedule_file_path = os.path.join(os.path.dirname(__file__), 'irrigation_switchbox.yaml')
         smart_home.load_schedule(schedule_file_path)
 

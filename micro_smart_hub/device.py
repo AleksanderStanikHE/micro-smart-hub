@@ -1,7 +1,7 @@
 import threading
 import time
 from enum import Enum
-from micro_smart_hub.registry import register_class
+from micro_registry.registry import register_class
 
 
 class DeviceState(Enum):
@@ -11,10 +11,8 @@ class DeviceState(Enum):
 
 
 class MicroDevice():
-    def __init__(self, definition) -> None:
-        if not definition:
-            definition = {}
-        self.definition = definition
+    def __init__(self, interval: float = 1.0) -> None:
+        self.interval = interval
         self.configuration = None
         self.state = DeviceState.NOT_CONNECTED
         self.pooling_counter = 0
@@ -24,7 +22,6 @@ class MicroDevice():
         self.stop()
 
     def reset(self):
-        self.interval = self.definition.get("interval", 1.0)
         self.running = False
         self.thread = None
 
@@ -67,8 +64,8 @@ class MicroDevice():
 
 @register_class
 class IoTSwitch(MicroDevice):
-    def __init__(self, definition={}) -> None:
-        super().__init__(definition)
+    def __init__(self) -> None:
+        super().__init__()
         self._on = 0
 
     @property
