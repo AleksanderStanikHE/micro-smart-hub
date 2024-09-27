@@ -10,17 +10,17 @@ from unittest.mock import patch
 from datetime import datetime, timedelta
 from micro_smart_hub.scheduler import MicroScheduler, SchedulerRunner
 from micro_smart_hub.automation import Automation
-from micro_smart_hub.device import IoTSwitch
+from micro_smart_hub.device import MicroSwitch
 from micro_registry.registry import instance_registry
 
 
 class TestMicroSchedulerRealScenario(unittest.TestCase):
 
     def setUp(self):
-        instance_registry["FakeAutomation_1"] = Automation()
-        instance_registry["FakeSwitch_1"] = IoTSwitch()
+        instance_registry["FakeAutomation_1"] = Automation(name="FakeAutomation_1")
+        instance_registry["FakeSwitch_1"] = MicroSwitch(name="FakeSwitch_1")
 
-        self.scheduler = MicroScheduler()
+        self.scheduler = MicroScheduler(name="Scheduler")
         schedule_file_path = os.path.join(os.path.dirname(__file__), 'real_scenario_schedule.yaml')
         self.scheduler.load_schedule(schedule_file_path)
         self.runner = SchedulerRunner(self.scheduler)

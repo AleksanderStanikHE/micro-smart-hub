@@ -5,10 +5,12 @@ from concurrent.futures import ThreadPoolExecutor
 from micro_smart_hub.automation import Automation
 from micro_smart_hub.device import MicroDevice
 from micro_registry.registry import filter_instances_by_base_class
+from micro_registry.component import MicroComponent
 
 
-class MicroScheduler:
-    def __init__(self) -> None:
+class MicroScheduler(MicroComponent):
+    def __init__(self, name: str = '', parent=None, **kwargs) -> None:
+        super().__init__(name, parent)
         self.schedule = {}
         self.running = True
         self.executor = ThreadPoolExecutor()  # Executor for running synchronous tasks

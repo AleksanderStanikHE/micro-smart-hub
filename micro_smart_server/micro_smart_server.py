@@ -4,7 +4,7 @@ import argparse
 from datetime import datetime, timedelta
 from collections import defaultdict
 from micro_smart_hub.scheduler import MicroScheduler, MicroDevice, Automation
-from micro_smart_hub.registry import load_modules_from_directory, load_instances_from_yaml, filter_instances_by_base_class
+from micro_registry.registry import load_modules_from_directory, load_instances_from_yaml, filter_instances_by_base_class
 
 # Default directories and file names
 DEFAULT_DEVICE_DIRS = ['.']

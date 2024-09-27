@@ -2,6 +2,7 @@ import threading
 import time
 from enum import Enum
 from micro_registry.registry import register_class
+from micro_registry.component import MicroComponent
 
 
 class DeviceState(Enum):
@@ -10,8 +11,17 @@ class DeviceState(Enum):
     ERROR = "Error"
 
 
-class MicroDevice():
-    def __init__(self, interval: float = 1.0) -> None:
+class MicroDevice(MicroComponent):
+    def __init__(self,
+                 name: str = '',
+                 parent=None,
+                 device_type: str = '',
+                 location: str = '',
+                 interval: float = 1.0,
+                 **kwargs) -> None:
+        super().__init__(name, parent)
+        self.device_type = device_type
+        self.location = location
         self.interval = interval
         self.configuration = None
         self.state = DeviceState.NOT_CONNECTED
@@ -63,10 +73,10 @@ class MicroDevice():
 
 
 @register_class
-class IoTSwitch(MicroDevice):
-    def __init__(self) -> None:
-        super().__init__()
-        self._on = 0
+class MicroSwitch(MicroDevice):
+    def __init__(self, on: int = 0, **kwargs) -> None:
+        super().__init__(device_type='switch', **kwargs)
+        self._on = on
 
     @property
     def on(self):
@@ -75,3 +85,33 @@ class IoTSwitch(MicroDevice):
     @on.setter
     def on(self, value):
         self._on = value
+
+
+@register_class
+class MicroLight(MicroDevice):
+    def __init__(self, brightness: int = 100, **kwargs):
+        super().__init__(device_type='light', **kwargs)
+        self._brightness = brightness
+
+    @property
+    def brightness(self):
+        return self._brightness
+
+    @brightness.setter
+    def brightness(self, value):
+        self._brightness = value
+
+
+@register_class
+class MicroThermostat(MicroDevice):
+    def __init__(self, temperature: float = 20.0, **kwargs):
+        super().__init__(device_type='thermostat', **kwargs)
+        self._temperature = temperature
+
+    @property
+    def temperature(self):
+        return self._temperature
+
+    @temperature.setter
+    def temperature(self, value):
+        self._temperature = value

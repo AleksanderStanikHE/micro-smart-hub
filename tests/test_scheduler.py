@@ -8,13 +8,13 @@ import time
 from unittest.mock import patch
 from micro_smart_hub.scheduler import MicroScheduler
 from micro_smart_hub.automation import Automation
-from micro_smart_hub.device import IoTSwitch
+from micro_smart_hub.device import MicroSwitch
 from micro_registry.registry import instance_registry, class_registry
 
 
-class LazySwitch(IoTSwitch):
-    def __init__(self):
-        super().__init__()
+class LazySwitch(MicroSwitch):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self._on = 0
 
     @property
@@ -35,7 +35,7 @@ if sys.version_info >= (3, 8):
         def test_01_scheduler_init(self):
             instance_registry.clear()
             class_registry.clear()
-            scheduler = MicroScheduler()
+            scheduler = MicroScheduler(name="Scheduler")
             self.assertIsInstance(scheduler, MicroScheduler)
             self.assertIsInstance(scheduler.schedule, dict)
 
@@ -43,9 +43,9 @@ if sys.version_info >= (3, 8):
         async def test_02_scheduler(self, mock_datetime):
             mock_datetime.strftime = datetime.strftime
 
-            scheduler = MicroScheduler()
-            instance_registry["FakeAutomation"] = Automation()
-            instance_registry["FakeSwitch"] = LazySwitch()
+            scheduler = MicroScheduler(name="Scheduler")
+            instance_registry["FakeAutomation"] = Automation(name="FakeAutomation")
+            instance_registry["FakeSwitch"] = LazySwitch(name="FakeSwitch")
 
             # Load the schedule
             schedule_file_path = os.path.join(os.path.dirname(__file__), 'schedule.yaml')
@@ -76,13 +76,13 @@ if sys.version_info >= (3, 8):
         async def test_03_scheduler_concurrent_execution(self, mock_datetime):
             mock_datetime.strftime = datetime.strftime
 
-            scheduler = MicroScheduler()
-            instance_registry["Irrigation"] = Automation()
-            instance_registry["Garden_Lights"] = Automation()
-            instance_registry["Front_Lights"] = Automation()
-            instance_registry["Irrigation_Pump"] = LazySwitch()
-            instance_registry["Front_Light"] = LazySwitch()
-            instance_registry["Garden_Light"] = LazySwitch()
+            scheduler = MicroScheduler(name="Scheduler")
+            instance_registry["Irrigation"] = Automation(name="Irrigation")
+            instance_registry["Garden_Lights"] = Automation(name="Garden_Lights")
+            instance_registry["Front_Lights"] = Automation(name="Front_Lights")
+            instance_registry["Irrigation_Pump"] = LazySwitch(name="FakeSwitch")
+            instance_registry["Front_Light"] = LazySwitch(name="FakeSwitch")
+            instance_registry["Garden_Light"] = LazySwitch(name="FakeSwitch")
 
             # Load the schedule
             schedule_file_path = os.path.join(os.path.dirname(__file__), 'schedule.yaml')
@@ -114,9 +114,9 @@ if sys.version_info >= (3, 8):
             """Test that tasks are run even if the scheduler starts after the task time."""
             mock_datetime.strftime = datetime.strftime
 
-            scheduler = MicroScheduler()
-            instance_registry["FakeAutomation"] = Automation()
-            instance_registry["FakeSwitch"] = LazySwitch()
+            scheduler = MicroScheduler(name="Scheduler")
+            instance_registry["FakeAutomation"] = Automation(name="FakeAutomation")
+            instance_registry["FakeSwitch"] = LazySwitch(name="FakeSwitch")
 
             # Load the schedule
             schedule_file_path = os.path.join(os.path.dirname(__file__), 'schedule.yaml')
@@ -148,9 +148,9 @@ if sys.version_info >= (3, 8):
         async def test_05_scheduler_run_missed_background_tasks(self, mock_datetime):
             mock_datetime.strftime = datetime.strftime
 
-            scheduler = MicroScheduler()
-            instance_registry["DailyAutomation"] = Automation()
-            instance_registry["Daily_Switch"] = LazySwitch()
+            scheduler = MicroScheduler(name="Scheduler")
+            instance_registry["DailyAutomation"] = Automation(name="FakeAutomation")
+            instance_registry["Daily_Switch"] = LazySwitch(name="FakeSwitch")
 
             # Load the schedule
             schedule_file_path = os.path.join(os.path.dirname(__file__), 'schedule.yaml')
@@ -186,9 +186,9 @@ if sys.version_info >= (3, 8):
         async def test_06_scheduler_run_background_tasks(self, mock_datetime):
             mock_datetime.strftime = datetime.strftime
 
-            scheduler = MicroScheduler()
-            instance_registry["BackgroundAutomation"] = Automation()
-            instance_registry["Cont_Switch"] = LazySwitch()
+            scheduler = MicroScheduler(name="Scheduler")
+            instance_registry["BackgroundAutomation"] = Automation(name="BackgroundAutomation")
+            instance_registry["Cont_Switch"] = LazySwitch(name="FakeSwitch")
 
             self.assertEqual(instance_registry["Cont_Switch"].on, 0)
 
@@ -221,7 +221,7 @@ else:
             return self.loop.run_until_complete(coro)
 
         def test_scheduler_init(self):
-            scheduler = MicroScheduler()
+            scheduler = MicroScheduler(name="Scheduler")
             self.assertIsInstance(scheduler, MicroScheduler)
             self.assertIsInstance(scheduler.schedule, dict)
 
@@ -229,9 +229,9 @@ else:
         def test_scheduler(self, mock_datetime):
             mock_datetime.strftime = datetime.strftime
 
-            scheduler = MicroScheduler()
-            instance_registry["FakeAutomation"] = Automation()
-            instance_registry["FakeSwitch"] = LazySwitch()
+            scheduler = MicroScheduler(name="Scheduler")
+            instance_registry["FakeAutomation"] = Automation(name="FakeAutomation")
+            instance_registry["FakeSwitch"] = LazySwitch(name="FakeSwitch")
 
             # Load the schedule
             schedule_file_path = os.path.join(os.path.dirname(__file__), 'schedule.yaml')
@@ -262,13 +262,13 @@ else:
         def test_scheduler_concurrent_execution(self, mock_datetime):
             mock_datetime.strftime = datetime.strftime
 
-            scheduler = MicroScheduler()
-            instance_registry["Irrigation"] = Automation()
-            instance_registry["Garden_Lights"] = Automation()
-            instance_registry["Front_Lights"] = Automation()
-            instance_registry["Irrigation_Pump"] = LazySwitch()
-            instance_registry["Front_Light"] = LazySwitch()
-            instance_registry["Garden_Light"] = LazySwitch()
+            scheduler = MicroScheduler(name="Scheduler")
+            instance_registry["Irrigation"] = Automation(name="FakeAutomation")
+            instance_registry["Garden_Lights"] = Automation(name="FakeAutomation")
+            instance_registry["Front_Lights"] = Automation(name="FakeAutomation")
+            instance_registry["Irrigation_Pump"] = LazySwitch(name="FakeSwitch")
+            instance_registry["Front_Light"] = LazySwitch(name="FakeSwitch")
+            instance_registry["Garden_Light"] = LazySwitch(name="FakeSwitch")
 
             # Load the schedule
             schedule_file_path = os.path.join(os.path.dirname(__file__), 'schedule.yaml')
@@ -300,9 +300,9 @@ else:
             """Test that tasks are run even if the scheduler starts after the task time."""
             mock_datetime.strftime = datetime.strftime
 
-            scheduler = MicroScheduler()
-            instance_registry["FakeAutomation"] = Automation()
-            instance_registry["FakeSwitch"] = LazySwitch()
+            scheduler = MicroScheduler(name="Scheduler")
+            instance_registry["FakeAutomation"] = Automation(name="FakeAutomation")
+            instance_registry["FakeSwitch"] = LazySwitch(name="FakeSwitch")
 
             # Load the schedule
             schedule_file_path = os.path.join(os.path.dirname(__file__), 'schedule.yaml')
@@ -334,9 +334,9 @@ else:
         def test_scheduler_run_missed_background_tasks(self, mock_datetime):
             mock_datetime.strftime = datetime.strftime
 
-            scheduler = MicroScheduler()
-            instance_registry["DailyAutomation"] = Automation()
-            instance_registry["Daily_Switch"] = LazySwitch()
+            scheduler = MicroScheduler(name="Scheduler")
+            instance_registry["DailyAutomation"] = Automation(name="FakeAutomation")
+            instance_registry["Daily_Switch"] = LazySwitch(name="FakeSwitch")
 
             # Load the schedule
             schedule_file_path = os.path.join(os.path.dirname(__file__), 'schedule.yaml')
@@ -372,9 +372,9 @@ else:
         def test_scheduler_run_background_tasks(self, mock_datetime):
             mock_datetime.strftime = datetime.strftime
 
-            scheduler = MicroScheduler()
-            instance_registry["BackgroundAutomation"] = Automation()
-            instance_registry["Cont_Switch"] = LazySwitch()
+            scheduler = MicroScheduler(name="Scheduler")
+            instance_registry["BackgroundAutomation"] = Automation(name="FakeAutomation")
+            instance_registry["Cont_Switch"] = LazySwitch(name="FakeSwitch")
 
             self.assertEqual(instance_registry["Cont_Switch"].on, 0)
 
