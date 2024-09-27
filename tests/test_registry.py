@@ -9,11 +9,13 @@ from micro_registry.registry import load_modules_from_directory, class_registry,
 
 
 irrigation_definition = {
+    "name": "Irrigation",
     "latitude": 231.0,
     "longitude": 11.22
 }
 
 switchbox_definiton = {
+    "name": "SwitchBox",
     "url": "192.168.0.7"
 }
 

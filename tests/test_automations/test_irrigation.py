@@ -5,7 +5,7 @@ sys.path.append(os.path.abspath(os.path.dirname(os.path.dirname(os.path.dirname(
 import unittest
 from datetime import datetime
 from unittest.mock import patch, Mock
-from micro_smart_hub.device import IoTSwitch
+from micro_smart_hub.device import MicroSwitch
 from micro_smart_hub.automations.irrigation import Irrigation
 
 irrigation_scenarios = {
@@ -42,7 +42,7 @@ class TestIrrigation(unittest.TestCase):
             mock_datetime.now.return_value = datetime.strptime(params["date"], "%Y-%m-%d")
             hour = params["hour"]
             result = params["result"]
-            switch = IoTSwitch()
+            switch = MicroSwitch()
             irrigation.run(True, {"current_hour": hour}, [switch])
             self.assertTrue(switch.on == result, f"Wrong scenario {key}.")
 

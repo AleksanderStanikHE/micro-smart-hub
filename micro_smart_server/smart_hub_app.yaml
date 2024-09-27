@@ -1,0 +1,26 @@
+
+components:
+  - name: registry_api
+    class: RegistryRestApi
+    parameters:
+      host: "127.0.0.1"
+      port: 8000
+      start_server: True  # Do not start Uvicorn server during tests      
+    children:
+      - name: component_api
+        class: ComponentRestApi
+
+  - name: scheduler_main
+    class: MicroScheduler
+    children:
+      - name: Switch_1
+        class: MicroSwitch
+
+      - name: Switch_2
+        class: MicroSwitch
+
+      - name: Task_1
+        class: Automation
+
+      - name: Task_2
+        class: Automation

@@ -7,8 +7,12 @@ from micro_registry.registry import register_class
 
 @register_class
 class Irrigation(Automation):
-    def __init__(self, latitude, longitude) -> None:
-        super().__init__()
+    def __init__(self,
+                 latitude=0.0,
+                 longitude=0.0,
+                 **kwargs
+                 ) -> None:
+        super().__init__(**kwargs)
         self.latitude = latitude
         self.longitude = longitude
         self.soil_moisture_threshold = 0.2

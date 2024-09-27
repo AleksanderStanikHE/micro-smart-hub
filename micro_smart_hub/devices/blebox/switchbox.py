@@ -1,12 +1,14 @@
-from micro_smart_hub.device import IoTSwitch
+from micro_smart_hub.device import MicroSwitch
 from micro_registry.registry import register_class
 import requests
 
 
 @register_class
-class SwitchBox(IoTSwitch):
-    def __init__(self, url="127.0.0.1") -> None:
-        super().__init__()
+class SwitchBox(MicroSwitch):
+    def __init__(self,
+                 url="127.0.0.1",
+                 **kwargs) -> None:
+        super().__init__(**kwargs)
         self.url = url
         self.info = {}
         self.relays = []
