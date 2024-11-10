@@ -54,10 +54,10 @@ class TestMicroSchedulerRealScenario(unittest.TestCase):
                 current_time = start_time + timedelta(hours=hour_offset, minutes=minute_offset)
                 mock_datetime.now.return_value = current_time
 
-                expected_state = 0
+                expected_state = False
                 # Check the switch state based on the expected schedule
                 if on_time <= current_time < off_time:
-                    expected_state = 1
+                    expected_state = True
                 # Allow some time for the scheduler to process (this is where you might wait for real I/O in a real test)
                 time.sleep(0.01)
                 self.assertEqual(instance_registry["FakeSwitch_1"].on, expected_state, f"Hour = {hour_offset}:{minute_offset}")

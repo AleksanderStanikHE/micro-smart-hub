@@ -48,7 +48,7 @@ class Automation(MicroComponent):
         self.execute()
 
     def execute(self):
-        print(f"Executing automation '{self.name}' with action '{self.action}'.")
+        # print(f"Executing automation '{self.name}' with action '{self.action}'.")
         for device in self.target_devices:
             # Get the attribute or method from the device
             action_attr = getattr(device, self.action, None)
@@ -76,7 +76,7 @@ class Automation(MicroComponent):
                 if hasattr(self, 'value'):
                     try:
                         setattr(device, self.action, self.value)
-                        print(f"Set '{self.action}' to '{self.value}' on device '{device.name}'.")
+                        # print(f"Set '{self.action}' to '{self.value}' on device '{device.name}'.")
                     except Exception as e:
                         print(f"Error setting '{self.action}' on device '{device.name}': {e}")
                 else:

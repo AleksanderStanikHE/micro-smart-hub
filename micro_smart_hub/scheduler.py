@@ -10,26 +10,48 @@ from micro_registry.component import MicroComponent
 
 @register_class
 class MicroScheduler(MicroComponent):
-    def __init__(self, name: str = '', parent=None, **kwargs) -> None:
+    def __init__(self, name: str = '', parent=None, schedule_file: str = None, **kwargs) -> None:
         super().__init__(name, parent)
+        self.current_time = datetime.now()
+        self.current_day_name = self.current_time.strftime('%A')
+        self.time_to_next_action = None  # Time until the next scheduled action
+        self.next_automation_name = None  # Name of the next automation
+        self.next_action_info = None
+        self.next_action = None  # Action of the next automation
         self.schedule = {}
         self.running = True
         self.executor = ThreadPoolExecutor()  # Executor for running synchronous tasks
         self.last_run_time = None  # Track the last time the scheduler was run
+        self.load_schedule(schedule_file)
 
     def load_schedule(self, schedule_file: str):
         """Load schedule from a YAML file."""
+        if not schedule_file:
+            print("No schedule file provided or file name is empty.")
+            self.schedule = {}
+            return
         try:
             with open(schedule_file, 'r') as file:
                 self.schedule = yaml.safe_load(file)
+                print(f"Schedule loaded from '{schedule_file}'.")
+        except FileNotFoundError:
+            print(f"Schedule file '{schedule_file}' not found.")
+            self.schedule = {}
         except Exception as e:
             print(f"Error loading schedule file: {e}")
+            self.schedule = {}
 
     async def run(self) -> None:
         """Run scheduled tasks."""
         Automations = filter_instances_by_base_class(Automation)
+        self.current_time = datetime.now()
+        self.current_day_name = self.current_time.strftime('%A')
         current_time = datetime.now()
         current_day = current_time.strftime('%A').lower()
+
+        # Calculate time to the next action and update next automation details
+        self.time_to_next_action, self.next_automation_name, self.next_action = self.calculate_time_to_next_action(current_time)
+        self.next_action_info = self.next_automation_name, self.next_action
 
         # Set the last run time to current time if it's the first run
         if self.last_run_time is None:
@@ -129,6 +151,32 @@ class MicroScheduler(MicroComponent):
             tasks.append(self.execute_task(automation, action, parameters, devices))
 
         return tasks
+
+    def calculate_time_to_next_action(self, current_time: datetime):
+        """Calculate the time until the next scheduled action, and get its automation name and action."""
+        next_task_time = None
+        next_automation_name = None
+        next_action = None
+
+        for automation_name, automation_data in self.schedule.items():
+            schedule_tasks = automation_data.get('schedule', {})
+            for day_name, tasks_per_day in schedule_tasks.items():
+                for task in tasks_per_day:
+                    task_hour, task_minute = self.parse_task_time(task['time'])
+                    if day_name == 'daily':
+                        day_name = current_time.strftime('%A').lower()
+                    task_time = self.get_datetime_for_day(day_name, task_hour, task_minute)
+                    if task_time > current_time:
+                        if next_task_time is None or task_time < next_task_time:
+                            next_task_time = task_time
+                            next_automation_name = automation_name
+                            next_action = task.get('action', None)
+
+        if next_task_time:
+            time_to_next_action = next_task_time - current_time
+            return time_to_next_action, next_automation_name, next_action
+        else:
+            return None, None, None
 
     @staticmethod
     def parse_task_time(task_time):

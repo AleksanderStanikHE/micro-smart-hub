@@ -20,6 +20,8 @@ class Irrigation(Automation):
         self.wind_data = np.zeros(72)
         self.soil_moisture_data = np.zeros(72)
         self.url = f"https://api.open-meteo.com/v1/forecast?latitude={self.latitude}&longitude={self.longitude}&current=temperature_2m&hourly=precipitation_probability,precipitation,wind_speed_10m,soil_temperature_0cm,soil_moisture_0_to_1cm,soil_moisture_1_to_3cm,soil_moisture_3_to_9cm"
+        self.soil_moisture_key = 'soil_moisture_1_to_3cm'
+        self.wind_speed_key = 'wind_speed_10m'
 
     def check_soil_moisture(self, moisture_data, start_hour, end_hour, threshold) -> True:
         """
@@ -65,8 +67,8 @@ class Irrigation(Automation):
         end_date = future_date.strftime("%Y-%m-%d")
         response = requests.get(self.url + f"&start_date={start_date}&end_date={end_date}")
         weather_data = response.json()
-        self.wind_data = np.array(weather_data['hourly']['wind_speed_10m'])
-        self.soil_moisture_data = np.array(weather_data['hourly']['soil_moisture_1_to_3cm'])
+        self.wind_data = np.array(weather_data['hourly'][self.wind_speed_key])
+        self.soil_moisture_data = np.array(weather_data['hourly'][self.soil_moisture_key])
         if self.should_irrigate(current_hour):
             action = True
         else:
