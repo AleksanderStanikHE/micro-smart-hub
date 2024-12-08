@@ -1,21 +1,21 @@
 components:
   - name: registry_api
-    class: RegistryRestApi
+    class: micro_registry.registry_rest_api.RegistryRestApi
     parameters:
       host: "127.0.0.1"
       port: 8001
       start_server: True
     children:
       - name: component_api
-        class: ComponentRestApi
+        class: micro_registry.component_rest_api.ComponentRestApi
 
   - name: executor
-    class: Executor
+    class: micro_registry.executor.Executor
     parameters:
       default_interval: 1  # Default interval for child components in seconds
     children:
       - name: scheduler_main
-        class: MicroScheduler
+        class: micro_smart_hub.scheduler.MicroScheduler
         parameters:
           schedule_file: './micro_smart_server/schedule.yaml'
         children:
@@ -38,7 +38,7 @@ components:
             class: Automation
 
   - name: console_interface
-    class: ConsoleInterface
+    class: micro_registry.console_interface.ConsoleInterface
     parameters:
       ui:
         display_items:

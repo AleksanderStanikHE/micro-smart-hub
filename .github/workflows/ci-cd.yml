@@ -77,7 +77,7 @@ jobs:
       - name: Test execution of micro-smart-server
         run: |
           python -m pip install dist/*.whl  # Install the package locally
-          micro-smart-server --help  # Verify that the command runs
+          python -c "from micro_smart_hub.scheduler import MicroScheduler; print('MicroScheduler imported successfully')"
 
       - name: Archive build artifacts
         uses: actions/upload-artifact@v3  # Updated to v3

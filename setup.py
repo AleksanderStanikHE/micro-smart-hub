@@ -4,19 +4,16 @@ setup(
     name="micro-smart-hub",
     use_scm_version=True,
     setup_requires=['setuptools_scm'],
-    packages=find_packages(),
+    packages=find_packages(exclude=['tests', 'tests.*']),
     include_package_data=True,
     install_requires=[
         'flake8',
         'numpy',
         'requests',
         'pyyaml',
+        'micro-registry',
     ],
-    entry_points={
-        'console_scripts': [
-            'micro-smart-server=micro_smart_server.micro_smart_server:main',
-        ],
-    },
+
     author="Aleksander Stanik (Olek)",
     author_email="aleksander.stanik@hammerheadsengineers.com",
     description="A small smart hub building blocks package",
